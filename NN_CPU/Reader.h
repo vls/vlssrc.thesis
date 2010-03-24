@@ -4,7 +4,7 @@
 #include "global.h"
 #include "Image.h"
 #include <stdio.h>
-float* read(const char* filename, Image* imageList, int maxCount);
+bool read(const char* filename, Image* imageList, int maxCount);
 
 class FileGuard
 {

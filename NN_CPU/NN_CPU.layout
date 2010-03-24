@@ -1,31 +1,52 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="Image.h" open="1" top="0" tabpos="10">
+	<File name="DNeural.cpp" open="0" top="0" tabpos="7">
+		<Cursor position="925" topLine="16" />
+	</File>
+	<File name="Image.h" open="0" top="0" tabpos="10">
 		<Cursor position="207" topLine="0" />
 	</File>
-	<File name="Layer.cpp" open="1" top="0" tabpos="8">
-		<Cursor position="495" topLine="0" />
+	<File name="Layer.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="374" topLine="0" />
 	</File>
-	<File name="Layer.h" open="1" top="0" tabpos="9">
+	<File name="Layer.h" open="0" top="0" tabpos="6">
 		<Cursor position="305" topLine="0" />
 	</File>
-	<File name="Neural.cpp" open="1" top="0" tabpos="6">
-		<Cursor position="1048" topLine="36" />
+	<File name="MNeural.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="2826" topLine="105" />
 	</File>
-	<File name="Neural.h" open="1" top="0" tabpos="5">
-		<Cursor position="1258" topLine="38" />
+	<File name="MNeural.h" open="1" top="0" tabpos="4">
+		<Cursor position="670" topLine="5" />
 	</File>
-	<File name="Reader.cpp" open="1" top="0" tabpos="12">
+	<File name="Matrix.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="28612" topLine="1190" />
+	</File>
+	<File name="Matrix.h" open="1" top="0" tabpos="3">
+		<Cursor position="10895" topLine="16" />
+	</File>
+	<File name="Neural.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="2734" topLine="203" />
+	</File>
+	<File name="Neural.h" open="0" top="0" tabpos="2">
+		<Cursor position="750" topLine="6" />
+	</File>
+	<File name="Reader.cpp" open="0" top="0" tabpos="12">
 		<Cursor position="345" topLine="8" />
 	</File>
-	<File name="Reader.h" open="1" top="0" tabpos="11">
+	<File name="Reader.h" open="0" top="0" tabpos="11">
 		<Cursor position="314" topLine="0" />
 	</File>
-	<File name="global.h" open="1" top="0" tabpos="7">
-		<Cursor position="212" topLine="0" />
+	<File name="TargetGen.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="1324" topLine="0" />
 	</File>
-	<File name="main.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="902" topLine="23" />
+	<File name="TargetGen.h" open="0" top="0" tabpos="7">
+		<Cursor position="445" topLine="0" />
+	</File>
+	<File name="global.h" open="0" top="0" tabpos="4">
+		<Cursor position="324" topLine="0" />
+	</File>
+	<File name="main.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="1529" topLine="48" />
 	</File>
 </CodeBlocks_layout_file>

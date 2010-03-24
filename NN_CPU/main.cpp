@@ -4,6 +4,10 @@
 #include "Reader.h"
 #include "Image.h"
 #include "TargetGen.h"
+#include <string.h>
+#include "Matrix.h"
+#include "MNeural.h"
+
 using namespace std;
 
 const int READNUM = 50;
@@ -41,23 +45,36 @@ void Neural::Test()
 int main()
 {
     cout << "Hello world!" << endl;
-	Image imageList[READNUM];
+    MNeural* nn;
+    try
+    {
+        Image imageList[READNUM];
 
 
-    read("image.txt", imageList, READNUM);
+        if(read("image.txt", imageList, READNUM))
+        {
+            TBinGen gen(4, 10);
 
-    TBinGen gen(4, 10);
+            nn = new MNeural();
+            nn->Init(TRAINNUM);
+            nn->tarptr = &gen;
 
-    Neural* nn = new DNeural();
-    nn->Init();
-    nn->tarptr = &gen;
+            nn->GenerateWeight();
 
-    nn->GenerateWeight();
-    nn->TrainSet(imageList, TRAINNUM, 0.0001, 1000);
-    nn->TestSet(imageList + TRAINNUM, READNUM - TRAINNUM);
-    delete nn;
+            nn->TrainSet(imageList, TRAINNUM, 0.0001, 1000, 0.001 ,10e6);
+            //nn->TestSet(imageList + TRAINNUM, READNUM - TRAINNUM);
+        }
 
 
+
+    }
+    catch(string errs)
+    {
+        cerr << errs << endl;
+    }
+
+    if(nn!= NULL)
+        delete nn;
 
     cout << "Done" << endl;
     return 0;

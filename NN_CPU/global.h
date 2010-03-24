@@ -7,8 +7,8 @@
 
 typedef boost::multi_array<float, 2> Array2Df;
 
-const int ROW = 28;
-const int COL = 28;
+const int ROW = 21;
+const int COL = 21;
 
 const int OUTPUT = 10;
 
@@ -16,7 +16,7 @@ const float LEARNCOST = 0.5f;
 
 const int NUM_LAYERS = 3;
 
-static int UNITS[NUM_LAYERS] = {ROW*COL, 100, 4};
+static int UNITS[NUM_LAYERS] = {ROW*COL, 1, 4};
 
 
 

@@ -6,19 +6,22 @@
 	"Reader.h"
 	"Image.h"
 
-1268670050 source:i:\temp\nn_cpu\main.cpp
+1269424943 source:i:\temp\nn_cpu\main.cpp
 	<iostream>
 	"Neural.h"
 	"Layer.h"
 	"Reader.h"
 	"Image.h"
 	"TargetGen.h"
+	<string.h>
+	"Matrix.h"
+	"MNeural.h"
 
 1268468546 i:\temp\nn_cpu\neural.cpp
 	"Neural.h"
 	<iostream>
 
-1268670164 i:\temp\nn_cpu\neural.h
+1269412956 i:\temp\nn_cpu\neural.h
 	"global.h"
 	"Layer.h"
 	<math.h>
@@ -2903,7 +2906,7 @@
 	<boost/type_traits/detail/bool_trait_def.hpp>
 	<boost/type_traits/detail/bool_trait_undef.hpp>
 
-1268670155 i:\temp\nn_cpu\global.h
+1269425945 i:\temp\nn_cpu\global.h
 	"boost/multi_array.hpp"
 	"boost/array.hpp"
 	"windows.h"
@@ -2914,11 +2917,11 @@
 1268635625 i:\temp\nn_cpu\layer.h
 	"global.h"
 
-1268636924 source:i:\temp\nn_cpu\layer.cpp
+1269058222 source:i:\temp\nn_cpu\layer.cpp
 	"Layer.h"
 	<iostream>
 
-1268670533 source:i:\temp\nn_cpu\neural.cpp
+1269412964 source:i:\temp\nn_cpu\neural.cpp
 	"Neural.h"
 	<iostream>
 	<math.h>
@@ -2962,12 +2965,12 @@
 1268551625 source:i:\document\my documents\大学作业\论文\src\nn_cpu\image.cpp
 	"Image.h"
 
-1268561900 source:i:\temp\nn_cpu\reader.cpp
+1269424905 source:i:\temp\nn_cpu\reader.cpp
 	"Reader.h"
 	<iostream>
 	<stdio.h>
 
-1268561838 i:\temp\nn_cpu\reader.h
+1269424962 i:\temp\nn_cpu\reader.h
 	"global.h"
 	"Image.h"
 	<stdio.h>
@@ -2977,13 +2980,32 @@
 1268551625 source:i:\temp\nn_cpu\image.cpp
 	"Image.h"
 
-1268637314 source:i:\temp\nn_cpu\dneural.cpp
+1269239550 source:i:\temp\nn_cpu\dneural.cpp
 	"Neural.h"
 	<iostream>
 
 1268653244 i:\temp\nn_cpu\targetgen.h
 	"global.h"
 
-1268653290 source:i:\temp\nn_cpu\targetgen.cpp
+1268670577 source:i:\temp\nn_cpu\targetgen.cpp
 	"TargetGen.h"
+	"Neural.h"
+
+1269407924 i:\temp\nn_cpu\matrix.h
+	"global.h"
+
+1269425313 source:i:\temp\nn_cpu\mneural.cpp
+	"MNeural.h"
+
+1269407901 i:\temp\nn_cpu\mneural.h
+	"Neural.h"
+	"Matrix.h"
+
+1269425013 source:i:\temp\nn_cpu\matrix.cpp
+	<iostream>
+	"Matrix.h"
+	<math.h>
+	<stdlib.h>
+	<conio.h>
+	<stdio.h>
 

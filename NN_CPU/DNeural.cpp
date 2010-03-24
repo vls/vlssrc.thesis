@@ -3,7 +3,7 @@
 
 using namespace std;
 
-const int ALPHA = 0.5;
+const float ALPHA = 0.5;
 
 void DNeural::InitLayer()
 {

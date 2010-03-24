@@ -13,7 +13,7 @@ float Sigmoid(float x)
     return 1 / (1 + exp(0 - x));
 }
 
-Neural::Neural()
+Neural::Neural() : layers(NULL), InputLayer(NULL), OutputLayer(NULL)
 {
     this->units = UNITS;
     this->num_layer = NUM_LAYERS;
@@ -22,7 +22,7 @@ Neural::Neural()
     this->tarptr = new TBinGen(this->units[this->num_layer -1], OUTPUT);
 }
 
-Neural::Neural(int* units, int num_layer, float learnRate, TargetGenBase* tarptr)
+Neural::Neural(int* units, int num_layer, float learnRate, TargetGenBase* tarptr) : layers(NULL), InputLayer(NULL), OutputLayer(NULL)
 {
     this->units = units;
     this->num_layer = num_layer;
@@ -34,11 +34,16 @@ Neural::Neural(int* units, int num_layer, float learnRate, TargetGenBase* tarptr
 
 Neural::~Neural()
 {
-
-    for(int i = 0; i < NUM_LAYERS; i++)
+    if(this->layers != NULL)
     {
-        delete this->layers[i];
+        for(int i = 0; i < NUM_LAYERS; i++)
+        {
+            if(this->layers[i] != NULL)
+                delete this->layers[i];
+        }
+        delete this->layers;
     }
+
 
 }
 

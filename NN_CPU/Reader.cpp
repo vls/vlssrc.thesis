@@ -21,7 +21,7 @@ FileGuard::~FileGuard()
     }
 }
 
-float* read(const char* filename, Image* imageList, int maxCount)
+bool read(const char* filename, Image* imageList, int maxCount)
 {
 	FileGuard guard(filename, "r");
 
@@ -52,10 +52,10 @@ float* read(const char* filename, Image* imageList, int maxCount)
 
 			int zz = 0;
 		}
-
+        return true;
 	}
 	else
 		cout << "Not Found"  << endl;
-	return NULL;
+	return false;
 
 }

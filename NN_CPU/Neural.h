@@ -26,13 +26,13 @@ public:
     virtual void InitLayer();
     virtual void Init();
 
-    float Train(float* input, float* target);
-    void TrainSet(Image* imageList, int count, float diff, int maxIter);
-    void GenerateWeight();
-    void SetInput(float* input);
 
-    bool Test(float* input, int label);
-    void TestSet(Image* imageList, int count);
+    virtual void TrainSet(Image* imageList, int count, float diff, int maxIter);
+    virtual void GenerateWeight();
+
+
+    virtual bool Test(float* input, int label);
+    virtual void TestSet(Image* imageList, int count);
 
     float Error;
 
@@ -43,8 +43,9 @@ public:
 
 
 protected:
+    virtual float Train(float* input, float* target);
 
-
+    virtual void SetInput(float* input);
 
     Layer** layers;
 
