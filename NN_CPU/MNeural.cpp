@@ -1,0 +1,286 @@
+#include "MNeural.h"
+
+const int _NUMLAYER = 3;
+
+MNeural::MNeural()
+{
+    this->units = new int[_NUMLAYER];
+    this->units[0] = UNITS[0];
+    this->units[1] = UNITS[1];
+    this->units[2] = UNITS[NUM_LAYERS-1];
+
+    this->num_layer = _NUMLAYER;
+
+    this->learnRate = LEARNCOST;
+
+    this->tarptr = new TBinGen(this->units[this->num_layer -1], OUTPUT);
+}
+
+MNeural::MNeural(int* units, float learnRate, TargetGenBase* tarptr)
+{
+    this->units = units;
+    this->num_layer = _NUMLAYER;
+
+    this->learnRate = learnRate;
+
+    this->tarptr = tarptr;
+}
+
+MNeural::~MNeural()
+{
+    delete[] this->units;
+}
+
+void MNeural::Init(int numSample)
+{
+    this->numInput = this->units[0];
+    this->numOutput = this->units[this->num_layer-1];
+    this->numHidden = this->units[1];
+
+    this->numSample = numSample;
+
+    this->mInputValue.Resize(numInput, numSample);
+
+    this->mI2HWeight.Resize(numHidden, numInput);
+
+
+    this->mH2OWeight.Resize(numOutput, numHidden);
+
+
+    this->mHideBias.Resize(numHidden, 1);
+
+
+    this->mOutputBias.Resize(numOutput, 1);
+
+}
+
+void MNeural::GenerateWeight()
+{
+    this->mI2HWeight.RandomInitialize(HIGH, LOW);
+    this->mH2OWeight.RandomInitialize(HIGH, LOW);
+    this->mHideBias.RandomInitialize(HIGH, LOW);
+    this->mOutputBias.RandomInitialize(HIGH, LOW);
+}
+
+
+void MNeural::TrainSet(Image* imageList, int count, float diff, int maxIter, float nStep, float maxStep)
+{
+
+
+    for(int i=0; i < count; i++)
+    {
+        int length = imageList[i].length;
+        for(int j=0;j<length;j++)
+        {
+            this->mInputValue.m_pTMatrix[j][i] = imageList[i].content[j];
+        }
+
+    }
+
+    Forward();
+
+    CMatrix mDemoOutput(this->numOutput, this->numSample);
+
+    for(int i=0;i < count;i++)
+    {
+        float* target = tarptr->GetTarget(imageList[i].label);
+        for(int j = 0;j<this->numOutput;j++)
+        {
+            mDemoOutput.m_pTMatrix[j][i] = target[j];
+        }
+    }
+
+    CMatrix mOutputError(this->numOutput, this->numSample);
+    mOutputError = mDemoOutput - this->mOutOutput;
+
+    float sysErrOld = mOutputError.GetSystemError();
+
+    for(int loopTime = 1; loopTime < maxIter; loopTime++)
+    {
+        printf("Iter %d\n", loopTime);
+        if(sysErrOld < diff)
+        {
+            loopTime--;
+            break;
+        }
+
+        CMatrix mExHideOutput;
+        mExHideOutput.nncpyi(this->mHideOutput, this->numOutput);
+
+        CMatrix mOutDelta(this->numOutput, this->numSample);
+
+        mOutDelta = this->mOutOutput / this->mOutOutput - 1;
+
+        CMatrix mExOutputDelta;
+        mExOutputDelta.nncpyd(mOutDelta);
+
+        CMatrix t_mH2OWeight(this->mH2OWeight.GetMatrixColNumber(), this->mH2OWeight.GetMatrixRowNumber());
+        t_mH2OWeight = this->mH2OWeight.Transpose();
+
+        CMatrix mExHideDelta;
+        mExHideDelta = (1 - mExHideOutput / mExHideOutput) / (t_mH2OWeight * mExOutputDelta);
+
+        CMatrix mExInput;
+        mExInput.nncpyi(this->mInputValue, this->numOutput);
+
+        CMatrix mJ11;
+        mJ11.nncpy(mExHideDelta.Transpose(), mExInput.GetMatrixRowNumber());
+
+        CMatrix mJ12;
+        mJ12.nncpyi(mExInput.Transpose(), mExHideDelta.GetMatrixRowNumber());
+
+        CMatrix mJ1;
+        mJ1 = mJ11 / mJ12;
+
+        CMatrix mJ21;
+        mJ21.nncpy(mExOutputDelta.Transpose(), mExHideOutput.GetMatrixRowNumber());
+
+        CMatrix mJ22;
+        mJ22.nncpyi(mExHideOutput.Transpose(), mExOutputDelta.GetMatrixRowNumber());
+
+        CMatrix mJ2;
+        mJ2 = mJ21 / mJ22;
+
+        int colArr[4];
+        colArr[0] = mJ1.GetMatrixColNumber();
+        colArr[1] = colArr[0] + mExHideDelta.GetMatrixRowNumber();
+        colArr[2] = colArr[1] + mJ2.GetMatrixColNumber();
+        colArr[3] = colArr[2] + mExOutputDelta.GetMatrixRowNumber();
+
+        CMatrix matrixZ(this->numOutput * this->numSample, colArr[3]);
+        mJ1.CopyTo(matrixZ, 0, 0);
+        mExHideDelta.Transpose().CopyTo(matrixZ, 0, colArr[0]);
+        mJ2.CopyTo(matrixZ, 0, colArr[1]);
+        mExOutputDelta.Transpose().CopyTo(matrixZ, 0, colArr[2]);
+
+        CMatrix c_mOutputError;
+        c_mOutputError = mOutputError.MergeColumnsToColumnVector();
+
+        CMatrix mJE;
+        mJE = matrixZ.Transpose() * c_mOutputError;
+
+
+
+        printf("About to calculate J(x)T * J(x)\n");
+
+        CMatrix mJJ;
+        mJJ = matrixZ.Transpose() * matrixZ;
+
+        printf("J(x)T * J(x) done\n");
+
+
+        // 定义新的输入层到隐含层的权值
+		CMatrix mNewI2HWeight;
+		// 定义的新的隐含层的阀值
+		CMatrix mNewHideBias;
+		// 定义新的隐含层到输出层的权值
+		CMatrix mNewH2OWeight;
+		// 定义新的输出层的阀值
+		CMatrix mNewOutputBias;
+
+		CMatrix newOutputError(this->numOutput, this->numSample);
+
+
+
+        float sysErrNew;
+		while(nStep <= maxStep)
+		{
+		    CMatrix matrixI(matrixZ.GetMatrixColNumber(), matrixZ.GetMatrixColNumber());
+		    matrixI.Eye();
+
+            #ifdef __DEBUG
+            printf("About to calculate the formula\n");
+            #endif
+
+		    CMatrix matrixDX;
+		    matrixDX = ((mJJ + matrixI * nStep).Inverse()) * mJE * (-1.0);
+
+		    int nIndex = 0;
+		    CMatrix mI2HWeightChange(this->numHidden, this->numInput);
+		    matrixDX.CopySubMatrixFromVector(mI2HWeightChange, 0);
+
+		    CMatrix mHideBiasChange(this->numHidden, 1);
+		    matrixDX.CopySubMatrixFromVector(mHideBiasChange, colArr[0]);
+
+		    CMatrix mH2OWeightChange(this->numOutput, this->numHidden);
+		    matrixDX.CopySubMatrixFromVector(mH2OWeightChange, colArr[1]);
+
+		    CMatrix mOutputBiasChange(this->numOutput, 1);
+		    matrixDX.CopySubMatrixFromVector(mOutputBiasChange, colArr[2]);
+
+		    mNewI2HWeight = mI2HWeight + mI2HWeightChange;
+		    mNewHideBias = mHideBias + mHideBiasChange;
+		    mNewH2OWeight = mH2OWeight + mH2OWeightChange;
+		    mNewOutputBias = mOutputBias + mOutputBiasChange;
+
+
+		    Forward();
+
+            mOutputError = mDemoOutput - this->mOutOutput;
+
+            sysErrNew = mOutputError.GetSystemError();
+
+            if(sysErrNew < sysErrOld)
+            {
+                break;
+            }
+            else
+            {
+                nStep *= 10;
+            }
+
+		}
+
+		if(nStep > maxStep)
+		{
+		    loopTime--;
+		    printf("Train failed\n");
+		    return;
+		}
+
+		nStep *= 0.1;
+
+		mI2HWeight = mNewI2HWeight;
+		mHideBias = mNewHideBias;
+		mH2OWeight = mNewH2OWeight;
+		mOutputBias = mNewOutputBias;
+		sysErrOld = sysErrNew;
+
+		printf("Iter %d : Err = %.3f", loopTime, sysErrOld);
+    }
+
+}
+
+void MNeural::Forward()
+{
+    printf("Forward ...\n");
+    CMatrix cMExHideBias;
+    cMExHideBias.nncpyi(this->mHideBias, this->numSample);
+
+    CMatrix cMHidePureInput(this->numHidden, this->numSample);
+    cMHidePureInput = this->mI2HWeight * this->mInputValue;
+    cMHidePureInput += cMExHideBias;
+
+    //CMatrix cMHideOutput(this->numHidden, this->numSample);
+
+    this->mHideOutput = cMHidePureInput.Sigmoid();
+
+    CMatrix cMExOutputBias;
+    cMExOutputBias.nncpyi(this->mOutputBias, this->numSample);
+
+    CMatrix cMOutPureInput(this->numOutput, this->numSample);
+
+    cMOutPureInput = this->mH2OWeight * this->mHideOutput;
+    cMOutPureInput += cMExOutputBias;
+
+    this->mOutOutput = cMOutPureInput.Sigmoid();
+}
+
+bool MNeural::Test(float* input, int label)
+{
+    return false;
+}
+
+void MNeural::TestSet(Image* imageList, int count)
+{
+}
