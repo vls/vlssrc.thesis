@@ -3,6 +3,8 @@
 
 #include "global.h"
 
+
+using namespace boost::numeric::ublas;
 class CMatrix
 {
 
@@ -18,7 +20,7 @@ public:
 
 	virtual ~CMatrix();
 
-	Array2Df m_pTMatrix;				// 指向矩阵的头指针
+	matrix<VALTYPE> m_pTMatrix;				// 指向矩阵的头指针
 
 	/////////////////////////////////////////////////////////////////////////
 	// According to the parameters nRow & nCol to construct a matrix
@@ -59,14 +61,14 @@ public:
 	CMatrix operator - (double nValue);
 
 	// 'CMatrix * CMatrix'
-	CMatrix operator * (CMatrix& cMatrixB);
+	CMatrix operator * (const CMatrix& cMatrixB);
 
 
 
 	// 'CMatrix * double'
 	CMatrix operator * (double nValue);
 	// 'CMatrix = CMatrix'
-	CMatrix& operator = (CMatrix cMatrixB);
+	CMatrix& operator = (const CMatrix& cMatrixB);
 
 
 
@@ -91,7 +93,7 @@ public:
 	/////////////////////////////////////////////////////////////////////////
 	// Get the matrix Row Number
 	//
-	int GetMatrixRowNumber() const
+	int GetRowCount() const
 	{
 		return m_nRow;
 	}
@@ -99,7 +101,7 @@ public:
 	/////////////////////////////////////////////////////////////////////////
 	// Get the matrix Colum Number
 	//
-	int GetMatrixColNumber() const
+	int GetColCount() const
 	{
 		return m_nCol;
 	}
@@ -316,6 +318,7 @@ public:
 
     void CopyTo(CMatrix& matrix, int startRow, int startCol);
 
+	void Print();
 
 private:
 

@@ -30,14 +30,14 @@ void DNeural::AdjustWeight()
 
                 float dWeight = ((DLayer*)this->layers[l])->dWeight[i][j];
 
-                float delta = this->learnRate * Err * Out + ::ALPHA * dWeight;
+                float delta = this->eta * Err * Out + ::ALPHA * dWeight;
 
 
 				this->layers[l]->weight[i][j] += delta;
-				((DLayer*)this->layers[l])->dWeight[i][j] = this->learnRate * Err * Out;
+				((DLayer*)this->layers[l])->dWeight[i][j] = this->eta * Err * Out;
 				int zz= 0;
 			}
-			float delta = this->learnRate * Err;
+			float delta = this->eta * Err;
 			this->layers[l]->bias[i] += delta;
 
 			int zz= 0;

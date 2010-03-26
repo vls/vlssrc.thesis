@@ -42,14 +42,15 @@ bool read(const char* filename, Image* imageList, int maxCount)
 
 			imageList[count].Init(N);
 			fscanf(guard.fp, "%d", &imageList[count].label);
-
+			//cout << imageList[count].label << endl;
 			imageList[count].length = N;
 
 			for(int i=0;i < N; i++)
 			{
-				fscanf(guard.fp, "%d", &imageList[count].content[i]);
+				fscanf(guard.fp, "%f", &imageList[count].content[i]);
+				//cout << imageList[count].content[i] << "\t";
 			}
-
+			//cout << endl;
 			int zz = 0;
 		}
         return true;
@@ -58,4 +59,43 @@ bool read(const char* filename, Image* imageList, int maxCount)
 		cout << "Not Found"  << endl;
 	return false;
 
+}
+
+
+bool read13(const char* filename, Image* imageList, int maxCount)
+{
+	FileGuard guard(filename, "r");
+
+	if(guard.fp != NULL)
+	{
+		int total;
+		int vectorLen;
+		fscanf(guard.fp, "%d", &total);
+		fscanf(guard.fp, "%d", &vectorLen);
+		cout << total << endl << vectorLen << endl;
+
+		int MAX = min(maxCount, total);
+
+		for(int count = 0; count < MAX; count ++)
+		{
+
+			const int N = vectorLen;
+
+			imageList[count].Init(N);
+			fscanf(guard.fp, "%d", &imageList[count].label);
+
+			imageList[count].length = N;
+
+			for(int i=0;i < N; i++)
+			{
+				fscanf(guard.fp, "%f", &imageList[count].content[i]);
+			}
+
+			int zz = 0;
+		}
+		return true;
+	}
+	else
+		cout << "Not Found"  << endl;
+	return false;
 }

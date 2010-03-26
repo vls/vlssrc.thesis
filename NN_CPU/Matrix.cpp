@@ -12,7 +12,6 @@
 #include <stdio.h>
 
 
-
 using namespace std;
 
 //////////////////////////////////////////////////////////////////////
@@ -20,7 +19,7 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////
 
 
-CMatrix::CMatrix() : m_pTMatrix(boost::extents[0][0])
+CMatrix::CMatrix() : m_pTMatrix(0, 0)
 {
     m_nRow = 0;
     m_nCol = 0;
@@ -34,14 +33,14 @@ CMatrix::~CMatrix()
 }
 
 
-CMatrix::CMatrix(int nRow,int nCol) : m_pTMatrix(boost::extents[nRow][nCol])
+CMatrix::CMatrix(int nRow,int nCol) : m_pTMatrix(nRow, nCol)
 {
 
 	for(int i=0; i < nRow; i++)
 	{
 		for(int j=0; j < nCol; j++)
 		{
-			m_pTMatrix[i][j] = 0.0f;
+			m_pTMatrix(i, j) = 0.0f;
 		}
 	}
 
@@ -52,7 +51,7 @@ CMatrix::CMatrix(int nRow,int nCol) : m_pTMatrix(boost::extents[nRow][nCol])
 }
 
 
-CMatrix::CMatrix(const CMatrix& cMatrixB) : m_pTMatrix(boost::extents[cMatrixB.GetMatrixRowNumber()][cMatrixB.GetMatrixColNumber()])
+CMatrix::CMatrix(const CMatrix& cMatrixB) : m_pTMatrix(cMatrixB.GetRowCount(), cMatrixB.GetColCount())
 {
 	// Initialize the variable
 	m_nRow = cMatrixB.m_nRow ;
@@ -80,7 +79,7 @@ CMatrix CMatrix::operator +(const CMatrix& cMatrixB)
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			cMatrix.m_pTMatrix [i][j] = m_pTMatrix [i][j] + cMatrixB.m_pTMatrix [i][j];
+			cMatrix.m_pTMatrix (i, j) = m_pTMatrix (i, j) + cMatrixB.m_pTMatrix(i, j);
 		}
 	}
 
@@ -103,7 +102,7 @@ CMatrix CMatrix::operator -(const CMatrix& cMatrixB)
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			cMatrix.m_pTMatrix [i][j] = m_pTMatrix [i][j] - cMatrixB.m_pTMatrix [i][j];
+			cMatrix.m_pTMatrix (i, j) = m_pTMatrix (i, j) - cMatrixB.m_pTMatrix(i, j);
 		}
 	}
 
@@ -119,7 +118,7 @@ CMatrix CMatrix::operator - (double nValue)
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			cMatrix.m_pTMatrix [i][j] = m_pTMatrix [i][j] - nValue;
+			cMatrix.m_pTMatrix (i, j) = m_pTMatrix(i, j) - nValue;
 		}
 	}
 
@@ -127,7 +126,7 @@ CMatrix CMatrix::operator - (double nValue)
 }
 
 
-CMatrix CMatrix::operator *(CMatrix& cMatrixB)
+CMatrix CMatrix::operator *(const CMatrix& cMatrixB)
 {
 	if( m_nCol != cMatrixB.m_nRow )
 	{
@@ -138,13 +137,13 @@ CMatrix CMatrix::operator *(CMatrix& cMatrixB)
 
 	for(int i=0; i < m_nRow; i++)
 	{
-	    printf("Row = %d/%d\n", i, m_nRow);
+	    //printf("Row = %d/%d\n", i, m_nRow);
 		for(int j=0; j < cMatrixB.m_nCol; j++)
 		{
 
             for(int m=0; m < m_nCol; m++)
 			{
-				cResultMatrix.m_pTMatrix [i][j] +=  m_pTMatrix [i][m] * cMatrixB.m_pTMatrix [m][j];
+				cResultMatrix.m_pTMatrix (i, j) +=  m_pTMatrix (i, m) * cMatrixB.m_pTMatrix(m, j);
 			}
 		}
 	}
@@ -161,7 +160,7 @@ CMatrix CMatrix::operator * (double nValue)
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			cMatrix.m_pTMatrix [i][j] =m_pTMatrix [i][j] * nValue;
+			cMatrix.m_pTMatrix (i, j) =m_pTMatrix(i, j) * nValue;
 		}
 	}
 
@@ -169,7 +168,7 @@ CMatrix CMatrix::operator * (double nValue)
 }
 
 
-CMatrix& CMatrix::operator =(CMatrix cMatrixB)
+CMatrix& CMatrix::operator =(const CMatrix& cMatrixB)
 {
     /*
 	if( (m_nRow != cMatrixB.m_nRow) || (m_nCol != cMatrixB.m_nCol) )
@@ -177,7 +176,7 @@ CMatrix& CMatrix::operator =(CMatrix cMatrixB)
 		throw string("等号左右两边的矩阵的维数不相等!");
 		return *this;	// return invalid value
 	}*/
-    m_pTMatrix.resize (boost::extents[cMatrixB.m_nRow][cMatrixB.m_nCol]);
+    m_pTMatrix.resize (cMatrixB.m_nRow, cMatrixB.m_nCol);
 	// 给变量赋值
 	m_nRow = cMatrixB.m_nRow ;
 	m_nCol = cMatrixB.m_nCol ;
@@ -201,7 +200,7 @@ CMatrix& CMatrix::operator += (CMatrix& cMatrixB)
 	{
 		for(int j=0; j< cMatrixB.m_nCol; j++)
 		{
-			m_pTMatrix [i][j] += cMatrixB.m_pTMatrix [i][j];
+			m_pTMatrix (i, j) += cMatrixB.m_pTMatrix(i, j);
 		}
 	}
 
@@ -218,7 +217,7 @@ CMatrix CMatrix::Transpose()
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			cMatrix.m_pTMatrix [j][i] = m_pTMatrix [i][j];
+			cMatrix.m_pTMatrix (j, i) = m_pTMatrix(i, j);
 		}
 	}
 
@@ -255,7 +254,7 @@ CMatrix CMatrix::MergeColumnsToColumnVector()
 	{
 		for(int i=0; i < m_nRow; i++)
 		{
-			cMatrix.m_pTMatrix [i + j * m_nRow][(int)0] = m_pTMatrix [i][j];
+			cMatrix.m_pTMatrix (i + j * m_nRow, (int)0) = m_pTMatrix(i, j);
 		}
 	}
 
@@ -275,7 +274,7 @@ double CMatrix::GetTotalElementValue()
 	{
 		for( int j=0; j < m_nCol; j++)
 		{
-			nTotalValue += m_pTMatrix [i][j];
+			nTotalValue += m_pTMatrix (i, j);
 		}
 	}
 
@@ -294,7 +293,7 @@ double	CMatrix::GetSystemError() const
 	{
 		for( int j=0; j < m_nCol; j++)
 		{
-			nSystemError += m_pTMatrix [i][j] * m_pTMatrix [i][j];
+			nSystemError += m_pTMatrix (i, j) * m_pTMatrix(i, j);
 		}
 	}
 
@@ -314,7 +313,7 @@ CMatrix CMatrix::AbsoluteValue ()
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			cMatrix.m_pTMatrix [i][j] = fabs( m_pTMatrix [i][j]);
+			cMatrix.m_pTMatrix (i, j) = fabs( m_pTMatrix(i, j));
 
 		}
 
@@ -324,7 +323,7 @@ CMatrix CMatrix::AbsoluteValue ()
 
 }
 
-
+/*
 CMatrix CMatrix::Inverse()
 {
 	/////////////////////////////////////////////////////////////////////////
@@ -366,15 +365,15 @@ CMatrix CMatrix::Inverse()
 		// 模最大者作为约化主元素,并交换矩阵相应的行
 
 		// 标记主元素
-		double nMaxElement = cMatrix.m_pTMatrix [k][k];
+		double nMaxElement = cMatrix.m_pTMatrix(k, k);
 		// 标记主元素所在的行数
 		int nMainRow = k;
 
 		for(int nCount = k+1; nCount < cMatrix.m_nCol; nCount++)
 		{
-			if( fabs(nMaxElement) < fabs(cMatrix.m_pTMatrix [nCount][k]) )
+			if( fabs(nMaxElement) < fabs(cMatrix.m_pTMatrix(nCount, k)) )
 			{
-				nMaxElement = cMatrix.m_pTMatrix [nCount][k];
+				nMaxElement = cMatrix.m_pTMatrix (nCount, k);
 				nMainRow = nCount;
 			}
 		}
@@ -390,22 +389,22 @@ CMatrix CMatrix::Inverse()
 		//Display();
 
 		//	判断是否是可逆阵
-		if(cMatrix.m_pTMatrix [k][k] == 0)
+		if(cMatrix.m_pTMatrix (k, k) == 0)
 		{
 			//printf("错误!此矩阵为非可逆阵!\n");
 			throw string("此矩阵为非可逆阵,没有逆矩阵!");
 		}
 
-		cMatrix.m_pTMatrix [k][k] = 1/(cMatrix.m_pTMatrix [k][k]);
+		cMatrix.m_pTMatrix (k, k) = 1/(cMatrix.m_pTMatrix(k, k));
 
 
 		// 算主列
 		for(int i=0; i < cMatrix.m_nRow; i++)
 		{
 			if( i != k)
-				cMatrix.m_pTMatrix [i][k] = -(cMatrix.m_pTMatrix [k][k]) * (cMatrix.m_pTMatrix [i][k]);
+				cMatrix.m_pTMatrix (i, k) = -(cMatrix.m_pTMatrix (k, k)) * (cMatrix.m_pTMatrix(i, k));
 
-			//int nTempValue = m_pTMatrix [i][k];
+			//int nTempValue = m_pTMatrix(i, k);
 
 		}
 
@@ -422,9 +421,9 @@ CMatrix CMatrix::Inverse()
 				if ( n == k)
 					continue;
 
-				cMatrix.m_pTMatrix [m][n] += cMatrix.m_pTMatrix [m][k] * cMatrix.m_pTMatrix [k][n];
+				cMatrix.m_pTMatrix (m, n) += cMatrix.m_pTMatrix (m, k) * cMatrix.m_pTMatrix(k, n);
 
-				//printf("%10f ",m_pTMatrix [m][n]);
+				//printf("%10f ",m_pTMatrix (m, n));
 
 			}
 
@@ -436,7 +435,7 @@ CMatrix CMatrix::Inverse()
 		for(int j=0; j < cMatrix.m_nCol; j++)
 		{
 			if( j != k)
-				cMatrix.m_pTMatrix [k][j] = (cMatrix.m_pTMatrix [k][k]) * (cMatrix.m_pTMatrix [k][j]);
+				cMatrix.m_pTMatrix (k, j) = (cMatrix.m_pTMatrix (k, k)) * (cMatrix.m_pTMatrix (k, j));
 
 		}
 
@@ -460,7 +459,40 @@ CMatrix CMatrix::Inverse()
 	return cMatrix;
 
 }
+*/
 
+CMatrix CMatrix::Inverse()
+{
+	using namespace boost::numeric::ublas;
+	typedef permutation_matrix<std::size_t> pmatrix;
+	
+
+	CMatrix inverse(m_nRow, m_nCol);
+
+	// create a working copy of the input
+	matrix<VALTYPE> A(this->m_pTMatrix);
+	// create a permutation matrix for the LU-factorization
+	pmatrix pm(A.size1());
+
+
+	// perform LU-factorization
+	int res = lu_factorize(A, pm);
+	if( res != 0 )
+	{
+		throw string("无法求出逆矩阵");
+	}
+
+
+	// create identity matrix of "inverse"
+	inverse.m_pTMatrix.assign(identity_matrix<VALTYPE>(A.size1()));
+
+
+	// backsubstitute to get the inverse
+	lu_substitute(A, pm, inverse.m_pTMatrix);
+
+
+	return inverse;
+}
 
 void CMatrix::SwapMatrixRow(int nRow1,int nRow2)
 {
@@ -472,9 +504,9 @@ void CMatrix::SwapMatrixRow(int nRow1,int nRow2)
 	for(int i=0; i < m_nCol; i++)
 	{
 		// Swap the datum of the two rows
-		pArray[0] = m_pTMatrix [nRow1][i];
-		m_pTMatrix [nRow1][i] = m_pTMatrix [nRow2][i];
-		m_pTMatrix [nRow2][i] = pArray[0];
+		pArray[0] = m_pTMatrix (nRow1, i);
+		m_pTMatrix (nRow1, i) = m_pTMatrix (nRow2, i);
+		m_pTMatrix (nRow2, i) = pArray[0];
 	}
 
 	delete pArray;
@@ -490,9 +522,9 @@ void CMatrix::SwapMatrixCol(int nCol1,int nCol2)
 	for(int i=0; i < m_nRow; i++)
 	{
 		// Swap the datum of the two columns
-		pArray[0] = m_pTMatrix [i][nCol1];
-		m_pTMatrix [i][nCol1] = m_pTMatrix [i][nCol2];
-		m_pTMatrix [i][nCol2] = pArray[0];
+		pArray[0] = m_pTMatrix (i, nCol1);
+		m_pTMatrix (i, nCol1) = m_pTMatrix (i, nCol2);
+		m_pTMatrix (i, nCol2) = pArray[0];
 	}
 
 	delete pArray;
@@ -521,11 +553,11 @@ void CMatrix::Eye()
 		{
 			if(i == j)
 			{
-				m_pTMatrix [i][j] =	1;
+				m_pTMatrix (i, j) =	1;
 			}
 			else
 			{
-				m_pTMatrix [i][j] =	0;
+				m_pTMatrix (i, j) =	0;
 			}
 		}
 
@@ -563,7 +595,7 @@ void CMatrix::GetMatrixData(CMatrix& cMatrix, int nIndex)
 	{
 		for(int j=0; j < cMatrix.m_nCol; j++)
 		{
-			m_pTMatrix [nIndex + i * cMatrix.m_nCol + j][0] = cMatrix.m_pTMatrix [i][j];
+			m_pTMatrix(nIndex + i * cMatrix.m_nCol + j, 0) = cMatrix.m_pTMatrix (i, j);
 		}
 
 	}
@@ -602,11 +634,11 @@ void CMatrix::SetMatrixData(CMatrix& cMatrix, int nIndex)
 	{
 		for(int j=0; j < cMatrix.m_nCol; j++)
 		{
-			cMatrix.m_pTMatrix [i][j] = m_pTMatrix [nIndex + i * cMatrix.m_nCol + j][0];
+			cMatrix.m_pTMatrix (i, j) = m_pTMatrix (nIndex + i * cMatrix.m_nCol + j, 0);
 
 			// Using for debugging
 			//int nIndexNumber = nIndex + i * cMatrix.m_nRow + j;
-			//double nData = cMatrix.m_pTMatrix [i][j];
+			//double nData = cMatrix.m_pTMatrix (i, j);
 
 		}
 	}
@@ -644,7 +676,7 @@ void CMatrix::SetMatrixRowData(CMatrix& cMatrix, int nIndex, int nRow)
 
 	for(int i=0; i < cMatrix.m_nCol; i++)
 	{
-		cMatrix.m_pTMatrix [nRow][i] = m_pTMatrix [nIndex + i][(int)0];
+		cMatrix.m_pTMatrix (nRow, i) = m_pTMatrix (nIndex + i, (int)0);
 	}
 
 }
@@ -677,7 +709,7 @@ void CMatrix::GetMatrixRowData(CMatrix& cMatrix, int nIndex, int nRow)
 
 	for(int i=0; i < cMatrix.m_nCol; i++)
 	{
-		m_pTMatrix [nIndex + i][(int)0] = cMatrix.m_pTMatrix [nRow][i];
+		m_pTMatrix (nIndex + i, (int)0) = cMatrix.m_pTMatrix (nRow, i);
 	}
 
 }
@@ -686,12 +718,12 @@ void CMatrix::SetMatrixRowNumber(int nRow)
 {
 	m_nRow = nRow;
 
-	m_pTMatrix.resize (boost::extents[m_nRow][m_nCol]);
+	m_pTMatrix.resize (m_nRow, m_nCol);
 	for(int i=0; i < m_nRow; i++)
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			m_pTMatrix[i][j] = (float) 0;
+			m_pTMatrix(i, j) = (float) 0;
 		}
 	}
 
@@ -702,12 +734,12 @@ void CMatrix::SetMatrixColNumber(int nCol)
 {
 	m_nCol = nCol;
 
-	m_pTMatrix.resize (boost::extents[m_nRow][m_nCol]);
+	m_pTMatrix.resize (m_nRow, m_nCol);
 	for(int i=0; i < m_nRow; i++)
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			m_pTMatrix[i][j] = (float) 0;
+			m_pTMatrix(i, j) = (float) 0;
 		}
 	}
 
@@ -726,12 +758,12 @@ void CMatrix::SetMatrixRowAndCol(int nRow,int nCol)
 	m_nCol = nCol;
 
 	// 分配内存
-	m_pTMatrix.resize (boost::extents[m_nRow][m_nCol]);
+	m_pTMatrix.resize (m_nRow, m_nCol);
 	for(int i=0; i < m_nRow; i++)
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			m_pTMatrix[i][j] = (float) 0;
+			m_pTMatrix(i, j) = (float) 0;
 		}
 	}
 
@@ -748,12 +780,12 @@ void CMatrix::Initialize()
 	m_nRow = 0;
 	m_nCol = 0;
 
-	m_pTMatrix.resize (boost::extents[m_nRow][m_nCol]);
+	m_pTMatrix.resize (m_nRow, m_nCol);
 	for(int i=0; i < m_nRow; i++)
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			m_pTMatrix[i][j] = (float) 0;
+			m_pTMatrix(i, j) = (float) 0;
 		}
 	}
 
@@ -769,12 +801,12 @@ void CMatrix::InitializeZero()
 	m_nRow = 0;
 	m_nCol = 0;
 
-	m_pTMatrix.resize (boost::extents[m_nRow][m_nCol]);
+	m_pTMatrix.resize (m_nRow, m_nCol);
 	for(int i=0; i < m_nRow; i++)
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			m_pTMatrix[i][j] = (float) 0;
+			m_pTMatrix(i, j) = (float) 0;
 		}
 	}
 
@@ -791,7 +823,7 @@ void CMatrix::RandomInitialize(float high, float low)
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			m_pTMatrix [i][j] = ((float) rand() / RAND_MAX) * (high - low) + low;
+			m_pTMatrix (i, j) = ((float) rand() / RAND_MAX) * (high - low) + low;
 		}
 	}
 
@@ -808,7 +840,7 @@ void CMatrix::RandomInitialize(float high, float low)
 
 void CMatrix::CopySubMatrix(CMatrix& cMatrix,int nStartX,int nStartY)
 {
-	if((m_nRow  < cMatrix.m_nRow + nStartY ) | (m_nCol  < cMatrix.m_nCol + nStartX))
+	if((m_nRow  < cMatrix.m_nRow + nStartX ) | (m_nCol  < cMatrix.m_nCol + nStartY))
 	{
 		throw string("被拷贝的矩阵维数小于要拷贝的矩阵所需要的维数!");
 		return;
@@ -818,7 +850,7 @@ void CMatrix::CopySubMatrix(CMatrix& cMatrix,int nStartX,int nStartY)
 	{
 		for(int j=0; j < cMatrix.m_nCol; j++)
 		{
-			cMatrix.m_pTMatrix [i][j] = m_pTMatrix [nStartY + i][nStartX + j];
+			cMatrix.m_pTMatrix (i, j) = m_pTMatrix (nStartX + i, nStartY + j);
 		}
 	}
 
@@ -861,7 +893,7 @@ void CMatrix::CopySubMatrixFromVector(CMatrix& cMatrix,int nIndex)
 	{
 		for(int i=0; i < cMatrix.m_nRow; i++)
 		{
-			cMatrix.m_pTMatrix [i][j] = m_pTMatrix [nIndex + j * cMatrix.m_nRow + i ][(int)0];
+			cMatrix.m_pTMatrix (i, j) = m_pTMatrix (nIndex + j * cMatrix.m_nRow + i , (int)0);
 		}
 	}
 
@@ -879,12 +911,12 @@ void CMatrix::nncpyi(const CMatrix &cMatrix, int nTimes)
 	m_nCol	=	cMatrix.m_nCol *	nTimes;
 
 	// 根据空间分配内存
-	m_pTMatrix.resize (boost::extents[m_nRow][m_nCol]);
+	m_pTMatrix.resize (m_nRow, m_nCol);
 	for(int i=0; i < m_nRow; i++)
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			m_pTMatrix[i][j] = (float) 0;
+			m_pTMatrix(i, j) = (float) 0;
 		}
 	}
 
@@ -895,7 +927,7 @@ void CMatrix::nncpyi(const CMatrix &cMatrix, int nTimes)
 		{
 			for(int k=0; k < nTimes; k++)
 			{
-				m_pTMatrix [i][j * nTimes + k] = cMatrix.m_pTMatrix [i][j];
+				m_pTMatrix (i, j * nTimes + k) = cMatrix.m_pTMatrix (i, j);
 			}
 		}
 	}
@@ -925,12 +957,12 @@ void CMatrix::nncpyd(CMatrix &cMatrix)
 	m_nCol	=	cMatrix.m_nCol * cMatrix.m_nRow ;
 
 	// 根据空间分配内存
-	m_pTMatrix.resize (boost::extents[m_nRow][m_nCol]);
+	m_pTMatrix.resize (m_nRow, m_nCol);
 	for(int i=0; i < m_nRow; i++)
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			m_pTMatrix[i][j] = (float) 0;
+			m_pTMatrix(i, j) = (float) 0;
 		}
 	}
 
@@ -942,7 +974,7 @@ void CMatrix::nncpyd(CMatrix &cMatrix)
 			for(int k=0; k < cMatrix.m_nRow; k++)
 			{
 				if(i == (j * cMatrix.m_nRow + k) % cMatrix.m_nRow )
-					m_pTMatrix [i][j * cMatrix.m_nRow + k] = cMatrix.m_pTMatrix [i][j];
+					m_pTMatrix (i, j * cMatrix.m_nRow + k) = cMatrix.m_pTMatrix (i, j);
 			}
 		}
 	}
@@ -973,12 +1005,12 @@ void CMatrix::nncpy(const CMatrix& cMatrix,int nTimes)
 	m_nCol = cMatrix.m_nCol * nTimes;
 
 	// 根据空间分配内存
-	m_pTMatrix.resize (boost::extents[m_nRow][m_nCol]);
+	m_pTMatrix.resize (m_nRow, m_nCol);
 	for(int i=0; i < m_nRow; i++)
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			m_pTMatrix[i][j] = (float) 0;
+			m_pTMatrix(i, j) = (float) 0;
 		}
 	}
 
@@ -989,7 +1021,7 @@ void CMatrix::nncpy(const CMatrix& cMatrix,int nTimes)
 		{
 			for(int k=0; k < cMatrix.m_nCol; k++)
 			{
-				m_pTMatrix [i][j * cMatrix.m_nCol + k] = cMatrix.m_pTMatrix [i][k];
+				m_pTMatrix (i, j * cMatrix.m_nCol + k) = cMatrix.m_pTMatrix (i, k);
 			}
 		}
 	}
@@ -1011,7 +1043,7 @@ CMatrix CMatrix::Sigmoid()
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			cMatrix.m_pTMatrix [i][j] = 1 / (1 + exp(-m_pTMatrix [i][j]));
+			cMatrix.m_pTMatrix (i, j) = 1 / (1 + exp(-m_pTMatrix (i, j)));
 		}
 
 	}
@@ -1036,7 +1068,7 @@ CMatrix CMatrix::tanh ()
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			cMatrix.m_pTMatrix [i][j] = 1 - (2 * exp(-m_pTMatrix [i][j])) / (1 + exp(-m_pTMatrix [i][j]));
+			cMatrix.m_pTMatrix (i, j) = 1 - (2 * exp(-m_pTMatrix (i, j))) / (1 + exp(-m_pTMatrix (i, j)));
 		}
 
 	}
@@ -1058,7 +1090,7 @@ CMatrix CMatrix::Tansig()
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			cMatrix.m_pTMatrix [i][j] = 2 / (1 + exp(- 2 * m_pTMatrix [i][j])) - 1;
+			cMatrix.m_pTMatrix (i, j) = 2 / (1 + exp(- 2 * m_pTMatrix (i, j))) - 1;
 		}
 	}
 
@@ -1081,7 +1113,7 @@ CMatrix CMatrix::TansigDerivative()
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			cMatrix.m_pTMatrix [i][j] = (2 / (1 + exp(- 2 * m_pTMatrix [i][j])) - 1) * (2 / (1 + exp(- 2 * m_pTMatrix [i][j])) - 1) - 1;
+			cMatrix.m_pTMatrix (i, j) = (2 / (1 + exp(- 2 * m_pTMatrix (i, j))) - 1) * (2 / (1 + exp(- 2 * m_pTMatrix (i, j))) - 1) - 1;
 		}
 	}
 
@@ -1105,7 +1137,7 @@ CMatrix CMatrix::SigmoidDerivative()
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			cMatrix.m_pTMatrix [i][j] = exp(-m_pTMatrix [i][j]) / ((1 + exp(-m_pTMatrix [i][j])) * (1 + exp(-m_pTMatrix [i][j])));
+			cMatrix.m_pTMatrix (i, j) = exp(-m_pTMatrix (i, j)) / ((1 + exp(-m_pTMatrix (i, j))) * (1 + exp(-m_pTMatrix (i, j))));
 		}
 
 	}
@@ -1129,7 +1161,7 @@ CMatrix CMatrix::tanhDerivative()
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			cMatrix.m_pTMatrix [i][j] = 2 * exp(-m_pTMatrix [i][j]) / ((1 + exp(-m_pTMatrix [i][j])) * (1 + exp(-m_pTMatrix [i][j])));
+			cMatrix.m_pTMatrix (i, j) = 2 * exp(-m_pTMatrix (i, j)) / ((1 + exp(-m_pTMatrix (i, j))) * (1 + exp(-m_pTMatrix (i, j))));
 		}
 
 	}
@@ -1158,7 +1190,7 @@ CMatrix CMatrix::operator / (const CMatrix& cMatrixB)
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			cMatrix.m_pTMatrix [i][j] = m_pTMatrix [i][j] * cMatrixB.m_pTMatrix [i][j];
+			cMatrix.m_pTMatrix (i, j) = m_pTMatrix (i, j) * cMatrixB.m_pTMatrix (i, j);
 		}
 
 	}
@@ -1169,7 +1201,7 @@ CMatrix CMatrix::operator / (const CMatrix& cMatrixB)
 
 void CMatrix::CopyTo(CMatrix& matrix, int startRow, int startCol)
 {
-    if(startCol + m_nCol > matrix.GetMatrixColNumber() || startRow + m_nRow > matrix.GetMatrixRowNumber())
+    if(startCol + m_nCol > matrix.GetColCount() || startRow + m_nRow > matrix.GetRowCount())
     {
         throw string("目标矩阵不能容纳源矩阵");
 
@@ -1179,9 +1211,23 @@ void CMatrix::CopyTo(CMatrix& matrix, int startRow, int startCol)
     {
         for(int j=0;j<m_nCol;j++)
         {
-            matrix.m_pTMatrix[startRow+i][startCol + j] = m_pTMatrix[i][j];
+            matrix.m_pTMatrix(startRow+i, startCol + j) = m_pTMatrix(i, j);
         }
     }
+}
+
+void CMatrix::Print()
+{
+	for(int i=0;i<m_nRow;i++)
+	{
+		for(int j=0;j<m_nCol;j++)
+		{
+			cout.precision(6);
+			
+			cout << fixed << m_pTMatrix(i, j) << "\t";
+		}
+		cout << endl;
+	}
 }
 
 //***************************************************************************
@@ -1194,13 +1240,13 @@ void CMatrix::CopyTo(CMatrix& matrix, int startRow, int startCol)
 
 CMatrix operator - (double nValue, const CMatrix& cMatrixB)
 {
-	CMatrix	cMatrix(cMatrixB.GetMatrixRowNumber(), cMatrixB.GetMatrixColNumber()) ;
+	CMatrix	cMatrix(cMatrixB.GetRowCount(), cMatrixB.GetColCount()) ;
 
-	for(int i=0; i < cMatrix.GetMatrixRowNumber (); i++)
+	for(int i=0; i < cMatrix.GetRowCount (); i++)
 	{
-		for(int j=0; j < cMatrix.GetMatrixColNumber (); j++)
+		for(int j=0; j < cMatrix.GetColCount (); j++)
 		{
-			cMatrix.m_pTMatrix [i][j] = nValue - cMatrixB.m_pTMatrix [i][j];
+			cMatrix.m_pTMatrix (i, j) = nValue - cMatrixB.m_pTMatrix(i, j);
 		}
 	}
 
@@ -1221,25 +1267,25 @@ CMatrix operator - (double nValue, const CMatrix& cMatrixB)
 CMatrix MergeMatrix(CMatrix& cMatrixA,CMatrix& cMatrixB)
 {
 	//	条件检测
-	if( cMatrixA.GetMatrixRowNumber () != cMatrixB.GetMatrixRowNumber () )
+	if( cMatrixA.GetRowCount () != cMatrixB.GetRowCount () )
 	{
 		throw string("参与合并的两个矩阵的行数不相等!");
 
 		return cMatrixA;	// return invalid value
 	}
 
-	CMatrix cMatrix(cMatrixA.GetMatrixRowNumber (),cMatrixA.GetMatrixColNumber () + cMatrixB.GetMatrixColNumber ());
+	CMatrix cMatrix(cMatrixA.GetRowCount (),cMatrixA.GetColCount () + cMatrixB.GetColCount ());
 
-	for(int i=0; i < cMatrixA.GetMatrixRowNumber (); i++)
+	for(int i=0; i < cMatrixA.GetRowCount (); i++)
 	{
-		for(int j=0; j < cMatrixA.GetMatrixColNumber (); j++)
+		for(int j=0; j < cMatrixA.GetColCount (); j++)
 		{
-			cMatrix.m_pTMatrix [i][j] = cMatrixA.m_pTMatrix [i][j];
+			cMatrix.m_pTMatrix (i, j) = cMatrixA.m_pTMatrix(i, j);
 		}
 
-		for(int k=0; k < cMatrixB.GetMatrixColNumber (); k++)
+		for(int k=0; k < cMatrixB.GetColCount (); k++)
 		{
-			cMatrix.m_pTMatrix [i][cMatrixA.GetMatrixColNumber () + k] = cMatrixB.m_pTMatrix [i][k];
+			cMatrix.m_pTMatrix (i, cMatrixA.GetColCount () + k) = cMatrixB.m_pTMatrix(i, k);
 		}
 
 	}

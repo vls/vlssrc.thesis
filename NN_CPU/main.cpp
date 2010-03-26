@@ -7,11 +7,12 @@
 #include <string.h>
 #include "Matrix.h"
 #include "MNeural.h"
+#include "MaNeural.h"
 
 using namespace std;
 
 const int READNUM = 50;
-const int TRAINNUM = 30;
+const int TRAINNUM = 5;
 
 void Neural::Test()
 {
@@ -45,26 +46,61 @@ void Neural::Test()
 int main()
 {
     cout << "Hello world!" << endl;
-    MNeural* nn;
+    MNeural* nn = NULL;
+
+
+	//freopen("out.txt", "w", stdout);
+	//freopen("out.txt", "w", stderr);
+
     try
     {
+		CMatrix c1(2,2);
+		c1.m_pTMatrix(0, 0) = 1;
+		c1.m_pTMatrix(0, 1) = 3;
+		c1.m_pTMatrix(1, 0) = 2;
+		c1.m_pTMatrix(1, 1) = 5;
+
+		c1.Print();
+		c1.Inverse().Print();
+
+
         Image imageList[READNUM];
-
-
-        if(read("image.txt", imageList, READNUM))
+		
+		
+		
+        if(read("image_21x21.txt", imageList, READNUM))
         {
+			
             TBinGen gen(4, 10);
-
-            nn = new MNeural();
+			int units[3];
+			units[0] = 441;
+			units[1] = 20;
+			units[2] = 4;
+            nn = new MaNeural(&units[0], 0.9, &gen);
             nn->Init(TRAINNUM);
             nn->tarptr = &gen;
 
             nn->GenerateWeight();
-
-            nn->TrainSet(imageList, TRAINNUM, 0.0001, 1000, 0.001 ,10e6);
+			
+            nn->TrainSet(imageList, TRAINNUM, 0.0001, 10000, 0.001 ,10e6);
             //nn->TestSet(imageList + TRAINNUM, READNUM - TRAINNUM);
-        }
+			
 
+			
+
+		}
+		/*
+		
+
+		if(read("image_21x21.txt", imageList, READNUM))
+		{
+			TBinGen gen(4, 10);
+			Neural* nptr = new Neural();
+			nptr->Init();
+			nptr->GenerateWeight();
+			nptr->TrainSet(imageList, TRAINNUM, 0.001, 10000);
+		}
+		*/
 
 
     }
@@ -77,5 +113,6 @@ int main()
         delete nn;
 
     cout << "Done" << endl;
+	getchar();
     return 0;
 }

@@ -52,7 +52,7 @@ protected:
     int numInput;
     int numOutput;
 
-    float learnRate;
+    float eta;
 
     int* units;
     int num_layer;

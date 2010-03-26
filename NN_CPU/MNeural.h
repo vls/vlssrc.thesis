@@ -28,7 +28,7 @@ public:
 
 protected:
 
-    void Forward();
+    void Forward(CMatrix& mI2HWeight, CMatrix& mHideBias, CMatrix& mH2OWeight, CMatrix& mOutputBias);
 
 
     int numSample;
