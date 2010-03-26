@@ -4,7 +4,8 @@ from PIL import Image
 import sys
 import struct
 import mycv
-
+import picHandler
+import copy
 
 TRAIN_LABEL = 'data/The MNIST database of handwritten digits/train-labels.idx1-ubyte'
 TRAIN_IMAGE = 'data/The MNIST database of handwritten digits/train-images.idx3-ubyte'
@@ -16,42 +17,54 @@ class HImage():
         #self.col = 0
         #self.arr = []
         self.image = None
+    
+    def __deepcopy__(self, memo):
+        new = HImage()
+        new.label = self.label
+        new.image = self.image.copy()
+        return new
         
 def writeBMP(himage, filename):
 
     
     
+    temphimage = copy.deepcopy(himage)
+    
+    afterImage = processImage(temphimage).image
     
     
-    afterImage = processImage(himage.image)
     
-    afterArr = list(afterImage.getdata())
-    #print len(afterArr)
-    #print afterArr
-    #afterArr = trimArr(afterArr)
-    
-    after = Image.new('L', (afterImage.size[0], afterImage.size[1]), 0)
-    after.putdata(afterArr)
-    
-    after.save(filename + '_trim.bmp', 'BMP')
+    afterImage.save(filename + '_trim.bmp', 'BMP')
     
     #print list(after.getdata())
     himage.image.save(filename + '.bmp', 'BMP')
 
-def processImage(pilImage):
+def processImage(himage):
     
-    
-    
+    pilImage = himage.image
+    oriSize = (pilImage.size[0], pilImage.size[1])
     factor = 3.0 / 4
     newSize = (int(pilImage.size[0] * factor), int(pilImage.size[1] *factor))
-    pilImage = pilImage.resize(newSize, Image.ANTIALIAS) 
+    #pilImage = pilImage.resize(newSize, Image.ANTIALIAS) 
     pilImage = mycv.binarize(pilImage)
     
     
-    #print newSize
     
     
-    return pilImage
+    #===========================================================================
+    # if(himage.label != 1):
+    # 
+    #    pilImage = picHandler.getRect(pilImage)
+    # #print 'newsize = %d %d' % (pilImage.size[0], pilImage.size[1])
+    # 
+    # 
+    # 
+    #    pilImage= picHandler.thinning(pilImage)
+    # #print newSize
+    #    pilImage = pilImage.resize(oriSize, Image.ANTIALIAS)
+    #===========================================================================
+    himage.image = pilImage
+    return himage
     
 
 def writeFile(filename, imageList):
@@ -60,9 +73,9 @@ def writeFile(filename, imageList):
             f.write(str(len(imageList)))
             f.write('\r\n')
             
-            pilimage = processImage(imageList[0].image)
+            pilimage = processImage(imageList[0]).image
             
-            f.write('%d %d' % (pilimage.size[0], pilimage.size[1]))
+            f.write('%d' % (13))
             f.write('\r\n')
             
             count = 0
@@ -77,13 +90,16 @@ def writeFile(filename, imageList):
 def appendImage(f, himage):
     f.write(str(himage.label))
     f.write('\r\n')
-    afterImage = processImage(himage.image)
     
-    afterArr = list(afterImage.getdata())
+    afterHImage = processImage(himage) 
     
-    afterArr = trimArr(afterArr)
+    
+    
+    afterArr = picHandler.divInto13(afterHImage.image)
+    
+    
     for num in afterArr:
-        f.write(str(num))
+        f.write('%.8f' % (num))
         f.write(' ')
     f.write('\r\n')
 
@@ -125,9 +141,10 @@ def readData():
 
                 imaList.append(ima)
     
-    
+    print 'begin to writeBMP'
     for i in range(10):
         ima = imaList[i]
+        
         writeBMP(ima, 'test' + str(i) + '_' + str(ima.label))
     
     print 'total = %d' % (len(imaList))
