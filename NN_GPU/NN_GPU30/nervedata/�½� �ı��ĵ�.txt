@@ -1,0 +1,69 @@
+void InitSample(int SamNum, int InDim, int OutDim, int HiddenUnitNum, float* h_SamInEx, float* h_SamOut, float* h_W1Ex,float* h_W2Ex)
+{
+	FILE *p;
+	p = fopen("D:\\samin.dat", "rb");
+
+	for(int i=0; i<size_SamInEx; i++)
+	{
+		h_SamInEx[i] = 1.0f;
+	}
+
+	for(int i=0; i<SamNum; i++)
+	{	
+		for(int j=0; j<InDim;j++)
+		{
+			fread(&h_SamInEx[j*SamNum+i],sizeof(float),1,p);
+		}
+	}
+	fclose(p);
+
+	for(int i=0; i<size_SamInEx; i++)
+	{
+		printf("%3.4f\t",h_SamInEx[i]);
+	}
+	
+	printf("\n");
+
+	p = fopen("D:\\samout.dat", "rb");
+	for(int i=0; i<SamNum; i++)
+	{	
+		for(int j=0; j<OutDim;j++)
+		{
+			fread(&h_SamOut[j*SamNum+i],sizeof(float),1,p);
+		}
+	}
+/*	for(int i=0; i<size_SamOut; i++)
+	{
+		printf("%3.5f\t",h_SamOut[i]);
+	}
+	fclose(p);*/
+
+	printf("\n");
+/*
+	for(int i=0; i<size_W1Ex; i++)
+	{
+		h_W1Ex[i]=0.2f*rand()/(float)RAND_MAX - 0.1f;
+	}
+*/
+	p = fopen("D:\\W1Ex.dat", "rb");
+	for(int i=0; i<(InDim+1); i++)
+	{	
+		for(int j=0; j<HiddenUnitNum;j++)
+		{
+			fread(&h_W1Ex[j*(InDim+1)+i],sizeof(float),1,p);
+		}
+	}
+
+	for(int i=0; i<size_W1Ex; i++)
+	{
+		printf("%3.5f\t",h_W1Ex[i]);
+	}
+	fclose(p);
+
+	for(int i=0; i<size_W2Ex; i++)
+	{
+		h_W2Ex[i]=0.2f*rand()/(float)RAND_MAX - 0.1f;
+	}
+
+	p=NULL;
+}
