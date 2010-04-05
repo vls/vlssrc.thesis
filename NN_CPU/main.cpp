@@ -8,11 +8,14 @@
 #include "Matrix.h"
 #include "MNeural.h"
 #include "MaNeural.h"
+#include "Tools.h"
 
 using namespace std;
 
-const int READNUM = 50;
+
+const int READNUM = 100;
 const int TRAINNUM = 5;
+const double PI = 3.1415926;
 
 void Neural::Test()
 {
@@ -22,36 +25,69 @@ void Neural::Test()
 
 	Neural nn(_UNITS, NUMLAYER, 0.9, &gen);
 
-	nn.layers[1]->weight[0][0] = 0.2;
-	nn.layers[1]->weight[0][1] = -0.4;
-	nn.layers[1]->weight[0][2] = -0.5;
+	nn.layers[1]->weight[0][0] = 0.2f;
+	nn.layers[1]->weight[0][1] = -0.4f;
+	nn.layers[1]->weight[0][2] = -0.5f;
 
-	nn.layers[1]->weight[1][0] = -0.3;
-	nn.layers[1]->weight[1][1] = 0.1;
-	nn.layers[1]->weight[1][2] = 0.2;
+	nn.layers[1]->weight[1][0] = -0.3f;
+	nn.layers[1]->weight[1][1] = 0.1f;
+	nn.layers[1]->weight[1][2] = 0.2f;
 
 
-	nn.layers[2]->weight[0][0] = -0.3;
-	nn.layers[2]->weight[0][1] = -0.2;
+	nn.layers[2]->weight[0][0] = -0.3f;
+	nn.layers[2]->weight[0][1] = -0.2f;
 
-	nn.layers[1]->bias[0] = -0.4;
-	nn.layers[1]->bias[1] = 0.2;
-	nn.layers[2]->bias[0] = 0.1;
+	nn.layers[1]->bias[0] = -0.4f;
+	nn.layers[1]->bias[1] = 0.2f;
+	nn.layers[2]->bias[0] = 0.1f;
 
 	float input[3] = {1.0, 0.0 , 1.0};
 	float target[1] = {1.0};
 	nn.Train(input, target);
 }
 
+void MatrixNeuralTest()
+{
+	int nSample = 3;
+	MyArray<float> x(nSample);
+	MyArray<float> y(nSample);
+	float* xptr = x.GetPtr();
+	float* yptr = y.GetPtr();
+	
+	for(int i=0; i<nSample; i++)
+	{
+		x[i] = (double)i / (double)nSample;
+		//用正弦曲线验证
+		y[i] = 0.5 * sin(x[i]*PI*0.5 ) + 0.5;
+		//y[i][0] = -0.4 * x[i][0] + 1;
+		//y[i][0] = 0.25*(x[i][0]-2)*(x[i][0]-2);
+	}
+
+	int units[3];
+	units[0] = 1;
+	units[1] = 8;
+	units[2] = 1;
+
+	
+	MaNeural* nptr = new MaNeural(&units[0], 0.1, NULL);
+	nptr->Init(nSample);
+	nptr->GenerateWeight();
+	nptr->TrainSet(xptr, yptr, TRAINNUM, 0.001, 5000, true, false);
+	for(int i=0;i<nSample;i++)
+	{
+		nptr->PrintTest(xptr+i);
+	}
+}
+
 int main()
 {
     cout << "Hello world!" << endl;
-    MNeural* nn = NULL;
+    MaNeural* nn = NULL;
 
 
 	//freopen("out.txt", "w", stdout);
 	//freopen("out.txt", "w", stderr);
-
+	MatrixNeuralTest();
     try
     {
 		CMatrix c1(2,2);
@@ -67,42 +103,61 @@ int main()
         Image imageList[READNUM];
 		
 		
-		
+		/*
         if(read("image_21x21.txt", imageList, READNUM))
         {
 			
             TBinGen gen(4, 10);
 			int units[3];
 			units[0] = 441;
-			units[1] = 20;
+			units[1] = 21;
 			units[2] = 4;
-            nn = new MaNeural(&units[0], 0.9, &gen);
+            nn = new MaNeural(&units[0], LEARNCOST, &gen);
             nn->Init(TRAINNUM);
             nn->tarptr = &gen;
 
             nn->GenerateWeight();
 			
-            nn->TrainSet(imageList, TRAINNUM, 0.0001, 10000, 0.001 ,10e6);
+            nn->TrainSet(imageList, TRAINNUM, 0.0001, 10000);
             //nn->TestSet(imageList + TRAINNUM, READNUM - TRAINNUM);
 			
 
 			
 
 		}
-		/*
 		
-
+		*/
+		
+		/*
 		if(read("image_21x21.txt", imageList, READNUM))
 		{
 			TBinGen gen(4, 10);
-			Neural* nptr = new Neural();
+			Neural* nptr = new DNeural();
 			nptr->Init();
 			nptr->GenerateWeight();
-			nptr->TrainSet(imageList, TRAINNUM, 0.001, 10000);
+			nptr->TrainSet(imageList, TRAINNUM, 0.0001, 10000);
+			nptr->TestSet(imageList+TRAINNUM, READNUM - TRAINNUM);
+			printf("Test Num = %d\n", READNUM - TRAINNUM);
 		}
 		*/
+		/*
+		if(read64("my_optdigits.tra", imageList, READNUM))
+		{
 
+			int units[3];
+			units[0] = 64;
+			units[1] = 16;
+			units[2] = 4;
 
+			TBinGen gen(4, 10);
+			MaNeural* nptr = new MaNeural(&units[0], 0.1, &gen);
+			nptr->Init(TRAINNUM);
+			nptr->GenerateWeight();
+			nptr->TrainSet(imageList, TRAINNUM, 0.001, 80000);
+			nptr->TestSet(imageList, TRAINNUM);
+		}
+
+		*/
     }
     catch(string errs)
     {
@@ -111,7 +166,7 @@ int main()
 
     if(nn!= NULL)
         delete nn;
-
+	freopen("CON", "w", stdout);
     cout << "Done" << endl;
 	getchar();
     return 0;

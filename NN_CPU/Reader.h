@@ -6,6 +6,7 @@
 #include <stdio.h>
 bool read(const char* filename, Image* imageList, int maxCount);
 bool read13(const char* filename, Image* imageList, int maxCount);
+bool read64(const char* filename, Image* imageList, int maxCount);
 
 class FileGuard
 {

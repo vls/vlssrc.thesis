@@ -86,8 +86,10 @@ int TBinGen::Check(float* output)
             predict |= 1;
 
         }
+		printf("%.3f\t", output[i]);
 
     }
+	printf("\n");
 
 
 
@@ -102,3 +104,4 @@ TBinGen::~TBinGen()
     }
     delete[] this->m_target;
 }
+

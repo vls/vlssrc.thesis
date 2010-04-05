@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkIncremental="2"
+				LinkIncremental="0"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -206,6 +206,10 @@
 				RelativePath=".\TargetGen.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Tools.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -256,6 +260,10 @@
 			</File>
 			<File
 				RelativePath=".\TargetGen.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tools.cpp"
 				>
 			</File>
 		</Filter>

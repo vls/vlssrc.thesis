@@ -758,7 +758,7 @@ void CMatrix::SetMatrixRowAndCol(int nRow,int nCol)
 	m_nCol = nCol;
 
 	// ·ÖÅäÄÚ´æ
-	m_pTMatrix.resize (m_nRow, m_nCol);
+	m_pTMatrix.resize (m_nRow, m_nCol, false);
 	for(int i=0; i < m_nRow; i++)
 	{
 		for(int j=0; j < m_nCol; j++)
@@ -823,7 +823,8 @@ void CMatrix::RandomInitialize(float high, float low)
 	{
 		for(int j=0; j < m_nCol; j++)
 		{
-			m_pTMatrix (i, j) = ((float) rand() / RAND_MAX) * (high - low) + low;
+			//m_pTMatrix (i, j) = ((float) rand() / RAND_MAX) * (high - low) + low;
+			m_pTMatrix (i, j) = (float)(rand()%2000) / 1000.0 - 1;
 		}
 	}
 

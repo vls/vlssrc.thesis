@@ -99,3 +99,34 @@ bool read13(const char* filename, Image* imageList, int maxCount)
 		cout << "Not Found"  << endl;
 	return false;
 }
+
+bool read64(const char* filename, Image* imageList, int maxCount)
+{
+	FileGuard guard(filename, "r");
+
+	if(guard.fp != NULL)
+	{
+
+		const int MAX = 64;
+
+		for(int count = 0; count < maxCount; count ++)
+		{
+
+			imageList[count].Init(MAX);
+			
+
+			imageList[count].length = MAX;
+
+			for(int i=0;i < MAX; i++)
+			{
+				fscanf(guard.fp, "%f", &imageList[count].content[i]);
+			}
+			fscanf(guard.fp, "%d", &imageList[count].label);
+		}
+		
+		return true;
+	}
+	else
+		cout << "Not Found"  << endl;
+	return false;
+}

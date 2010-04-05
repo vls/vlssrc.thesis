@@ -9,8 +9,8 @@
 #include "reader.h"
 #include "TargetGen.h"
 
-const float HIGH = 0.4;
-const float LOW = -0.4;
+const float HIGH = 0.9f;
+const float LOW = 0.1f;
 
 class Neural
 {
@@ -53,6 +53,10 @@ protected:
     int numOutput;
 
     float eta;
+	float alpha;
+	float beta;
+
+	float lastErr;
 
     int* units;
     int num_layer;
@@ -81,11 +85,13 @@ float Sigmoid(float x);
 
 class DNeural : public Neural
 {
-    virtual void InitLayer();
-
+public:
+    
+	DNeural(int* units, int num_layer, float learnRate, TargetGenBase* tarptr);
     virtual ~DNeural(){};
 
 private:
+	virtual void InitLayer();
     virtual void AdjustWeight();
 
 };

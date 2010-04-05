@@ -5,6 +5,12 @@ using namespace std;
 
 const float ALPHA = 0.5;
 
+
+DNeural::DNeural(int* units, int num_layer, float learnRate, TargetGenBase* tarptr) : Neural(units, num_layer, learnRate, tarptr)
+{
+
+}
+
 void DNeural::InitLayer()
 {
     cout << "Init DLayer" << endl;

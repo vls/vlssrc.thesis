@@ -1,8 +1,8 @@
 #ifndef GLOBAL_H_INCLUDED
 #define GLOBAL_H_INCLUDED
 
-#include "boost/multi_array.hpp"
-#include "boost/array.hpp"
+#include <boost/multi_array.hpp>
+#include <boost/array.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/lu.hpp>
 #include "windows.h"

@@ -17,7 +17,7 @@ Neural::Neural() : layers(NULL), InputLayer(NULL), OutputLayer(NULL)
 {
     this->units = UNITS;
     this->num_layer = NUM_LAYERS;
-    this->learnRate = LEARNCOST;
+    this->eta = LEARNCOST;
 
     this->tarptr = new TBinGen(this->units[this->num_layer -1], OUTPUT);
 }
@@ -27,7 +27,7 @@ Neural::Neural(int* units, int num_layer, float learnRate, TargetGenBase* tarptr
     this->units = units;
     this->num_layer = num_layer;
 
-    this->learnRate = learnRate;
+    this->eta = learnRate;
 
     this->tarptr = tarptr;
 }
@@ -69,7 +69,11 @@ void Neural::Init()
 
     this->InputLayer = this->layers[0];
     this->OutputLayer = this->layers[this->num_layer - 1];
+	
+	this->alpha = 1.05;
+	this->beta = 0.7;
 
+	this->lastErr = 0;
 }
 
 float Neural::Train(float* input, float* target)
@@ -138,12 +142,13 @@ void Neural::Simulate(float* input, float* target, bool Training)
 
 	ForwardNet();
 	ComputeNetError(target);
-
+/*
 	if(Training)
 	{
 		BackNet();
 		AdjustWeight();
 	}
+*/
 }
 
 void Neural::ComputeNetError(float* target)
@@ -196,11 +201,11 @@ void Neural::AdjustWeight()
 			{
 				float Out = this->layers[l-1]->output[j];
 
-                float delta = this->learnRate * Err * Out;
+                float delta = this->eta * Err * Out;
 				this->layers[l]->weight[i][j] += delta;
 				int zz= 0;
 			}
-			float delta = this->learnRate * Err;
+			float delta = this->eta * Err;
 			this->layers[l]->bias[i] += delta;
 
 			int zz= 0;
@@ -233,7 +238,7 @@ void Neural::TrainSet(Image* imageList, int count, float diff, int maxIter)
 
         }
         this->Error /= count;
-
+		
 
         if(this->Error < diff)
         {

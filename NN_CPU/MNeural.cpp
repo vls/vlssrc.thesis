@@ -13,17 +13,15 @@ MNeural::MNeural()
     this->units[1] = UNITS[1];
     this->units[2] = UNITS[NUM_LAYERS-1];
 
-    this->num_layer = _NUMLAYER;
 
     this->eta = LEARNCOST;
 
-    this->tarptr = new TBinGen(this->units[this->num_layer -1], OUTPUT);
+    this->tarptr = new TBinGen(this->units[_NUMLAYER-1 ], OUTPUT);
 }
 
 MNeural::MNeural(int* units, float learnRate, TargetGenBase* tarptr)
 {
     this->units = units;
-    this->num_layer = _NUMLAYER;
 
     this->eta = learnRate;
 
@@ -40,7 +38,7 @@ MNeural::~MNeural()
 void MNeural::Init(int numSample)
 {
     this->numInput = this->units[0];
-    this->numOutput = this->units[this->num_layer-1];
+    this->numOutput = this->units[_NUMLAYER-1];
     this->numHidden = this->units[1];
 
     this->numSample = numSample;
@@ -331,14 +329,18 @@ void MNeural::Forward(CMatrix& _mI2HWeight, CMatrix& _mHideBias, CMatrix& _mH2OW
 
 
     CMatrix cMHidePureInput(this->numHidden, this->numSample);
-	//cout << "mI2HWeight" << endl;
-	//_mI2HWeight.Print();
+// 	cout << "mI2HWeight" << endl;
+// 	_mI2HWeight.Print();
 	//cout << "mInputValue" << endl;
 	//this->mInputValue.Print();
     cMHidePureInput = _mI2HWeight * this->mInputValue;
 	//cout << "cMHidePureInput" << endl;
 	//cMHidePureInput.Print();
-    cMHidePureInput += cMExHideBias;
+
+
+    //cMHidePureInput += cMExHideBias;
+
+
 	//cout << "cMHidePureInput" << endl;
 	//cMHidePureInput.Print();
     //CMatrix cMHideOutput(this->numHidden, this->numSample);
@@ -364,7 +366,9 @@ void MNeural::Forward(CMatrix& _mI2HWeight, CMatrix& _mHideBias, CMatrix& _mH2OW
 	//cout << "cMOutPureInput" << endl;
 	//cMOutPureInput.Print();
 
-    cMOutPureInput += cMExOutputBias;
+    //cMOutPureInput += cMExOutputBias;
+
+
 	//cout << "cMOutPureInput" << endl;
 	//cMOutPureInput.Print();
     this->mOutOutput = cMOutPureInput.Sigmoid();
@@ -375,9 +379,37 @@ void MNeural::Forward(CMatrix& _mI2HWeight, CMatrix& _mHideBias, CMatrix& _mH2OW
 
 bool MNeural::Test(float* input, int label)
 {
-    return false;
+	this->numSample = 1;
+	this->mInputValue.Resize(this->numInput, 1);
+	
+	for(int i=0;i<this->numInput;i++)
+	{
+		this->mInputValue.m_pTMatrix(i, 1) = input[i];
+	}
+    Forward(this->mI2HWeight, this->mHideBias, this->mH2OWeight, this->mOutputBias);
+
+	float* output = new float[this->numOutput];
+	for(int i=0;i<this->numOutput;i++)
+	{
+		output[i] = this->mOutOutput.m_pTMatrix(i, 1);
+	}
+
+	int predict = tarptr->Check(output);
+	
+	printf("%d -> %d\n", label, predict);
+	delete[] output;
+	return label == predict;
 }
 
 void MNeural::TestSet(Image* imageList, int count)
 {
+	int right = 0;
+	for(int i=0;i<count;i++)
+	{
+		if(Test(imageList[i].content, imageList[i].label))
+		{
+			right++;
+		}
+	}
+	printf("Correct percent = %.3f%%\n", ((float)(right*100))/count);
 }

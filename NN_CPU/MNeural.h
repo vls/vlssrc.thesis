@@ -4,7 +4,7 @@
 #include "Neural.h"
 #include "Matrix.h"
 
-class MNeural : public Neural
+class MNeural
 {
 public:
     MNeural();
@@ -25,14 +25,18 @@ public:
 
     void Test();
 
-
+	TargetGenBase* tarptr;
 protected:
 
     void Forward(CMatrix& mI2HWeight, CMatrix& mHideBias, CMatrix& mH2OWeight, CMatrix& mOutputBias);
 
-
+	int* units;
     int numSample;
     int numHidden;
+	int numInput;
+	int numOutput;
+
+	float eta;
     CMatrix mInputValue;
     CMatrix mI2HWeight;
     CMatrix mHideBias;

@@ -34,4 +34,6 @@ private:
     int numClass;
 };
 
+
+
 #endif // TARGETGEN_H_INCLUDED
