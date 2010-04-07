@@ -76,10 +76,23 @@ run(int argc, char** argv)
 	float* h_SamOut;
 	float* h_W1Ex;
 	float* h_W2Ex;
-
+	printf("%s\n", cudaGetErrorString(cudaGetLastError()));
 	CUT_DEVICE_INIT(argc, argv);
-	cublasInit();
+	printf("%s\n", cudaGetErrorString(cudaGetLastError()));
 
+	
+	cublasStatus status;
+	status = cublasInit();
+	if(status != CUBLAS_STATUS_SUCCESS)
+	{
+		printf("Can't init cublas\n");
+		printf("%s\n", cudaGetErrorString(cudaGetLastError()));
+		return -1;
+	}
+	
+	printf("%s\n", cudaGetErrorString(cudaGetLastError()));
+	
+/*
 	CUDA_SAFE_CALL( cudaMallocHost((void**) &h_SamInEx, sizeof(float)*size_SamInEx));
 	CUDA_SAFE_CALL( cudaMallocHost((void**) &h_SamOut, sizeof(float)*size_SamOut));
 	CUDA_SAFE_CALL( cudaMallocHost((void**) &h_W1Ex, sizeof(float)*size_W1Ex));
@@ -91,7 +104,7 @@ run(int argc, char** argv)
 		return 0;
 	}
     train(lr, MaxEpochs, HiddenUnitNum, InDim, OutDim, SamNum, h_SamInEx, h_SamOut, h_W1Ex, h_W2Ex);
-	/*
+	/1*
 	printf("\n");
 	for(int i=0; i<size_W1Ex; i++)
 	{
@@ -103,7 +116,7 @@ run(int argc, char** argv)
 	{
 		printf("%3.3f ",h_W2Ex[i]);
 	}
-	*/
+	*1/
 	FILE *p;
 	p = fopen("I:\\temp\\NN_GPU\\nervedata0_W1Ex.dat", "wb");
 	fwrite(h_W1Ex,sizeof(float),size_W1Ex,p);
@@ -123,7 +136,7 @@ run(int argc, char** argv)
 	h_SamOut = NULL;
 	h_W1Ex=NULL;
 	h_W2Ex=NULL;
-
+*/
 	cublasShutdown();
 	CUT_EXIT(argc, argv);
 
@@ -145,7 +158,7 @@ bool InitSample(int SamNum, int InDim, int OutDim, int HiddenUnitNum, float* h_S
 
 	srand(clock());
 	FILE *p;
-	p = fopen("I:\\temp\\NN_GPU\\nervedata\\samin.dat", "rb");
+	p = fopen("I:\\temp\\NN_GPU\\NN_GPU30\\nervedata\\samin.dat", "rb");
 
 	if(!p) return false;
 
@@ -171,7 +184,7 @@ bool InitSample(int SamNum, int InDim, int OutDim, int HiddenUnitNum, float* h_S
 	
 	printf("\n");
 
-	p = fopen("I:\\temp\\NN_GPU\\nervedata\\samout.dat", "rb");
+	p = fopen("I:\\temp\\NN_GPU\\NN_GPU30\\nervedata\\samout.dat", "rb");
 	
 	if(!p) return false;
 
