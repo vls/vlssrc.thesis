@@ -3,4 +3,5 @@
 
 void Test();
 int Test2();
+void TestReduce();
 #endif

@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <cuda_runtime.h>
 #include <cutil.h>
-#include "nerve.h"
 
-#include "test.h"
 
 #if __DEVICE_EMULATION__
 
@@ -49,19 +47,3 @@ bool InitCUDA(void)
 
 
 
-int
-main( int argc, char** argv)
-{
-	printf("hello world\n");
-	
-	if (!InitCUDA())
-	{
-		return 0;
-	}
-	
-	run(argc, argv);
-
-	//Test();
-	getchar();
-	return 0;
-}

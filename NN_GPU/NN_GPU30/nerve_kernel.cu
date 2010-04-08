@@ -92,6 +92,12 @@ dotsub( float* C, float* A, float* B, int wA, int hA)
 }
 
 __global__ void
+getError(float* diffMat, int w, int h)
+{
+
+}
+
+__global__ void
 getdelta( float* C, float* A, int wA, int hA)
 {
     //const int tidx = threadIdx.x;

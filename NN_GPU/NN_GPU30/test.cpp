@@ -4,6 +4,8 @@
 #include <cutil.h>
 #include <stdio.h>
 #include <cublas.h>
+#include <assert.h>
+#include "Reduce.h"
 
 
 #define IDX2C(i,j,ld) (((j)*(ld))+(i))
@@ -471,4 +473,57 @@ int Test2()
 
 
 	return EXIT_SUCCESS;
+}
+
+
+float CPUSum(float* diff, int length)
+{
+	float sum = diff[0];
+	float c = 0.0f;              
+	for (int i = 1; i < length; i++)
+	{
+		float y = diff[i] - c;  
+		float t = sum + y;      
+		c = (t - sum) - y;  
+		sum = t;            
+	}
+	return sum;
+}
+
+
+float CPUPowSum(float* diff, int length)
+{
+	float sum = 0;           
+	for (int i = 0; i < length; i++)
+	{
+		sum += diff[i] * diff[i];
+	}
+	return sum;
+}
+
+void TestReduce()
+{
+	const int length = 10240;
+	float* diff;
+
+	diff = (float*) malloc(sizeof(float) * length);
+
+	for(int i=0;i<length;i++)
+	{
+		diff[i] = (float) rand() / RAND_MAX * 2;
+		assert(diff[i] < 2);
+		assert(diff[i] > 0);
+		//diff[i] = (float)i / 1234;
+	}
+
+	float cpuSum = CPUPowSum(diff, length);
+	float gpuSum = HostPowSum(diff, length);
+	printf("CPU result = %.6f\n", cpuSum);
+	printf("GPU result = %.6f\n", gpuSum);
+
+
+	double threshold = length * 1e-8;
+	double rdiff = abs((double)gpuSum - (double)cpuSum);
+	printf("%s\n\n", (rdiff < threshold) ? "PASSED" : "FAILED");
+	free(diff);
 }
