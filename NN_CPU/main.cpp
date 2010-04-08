@@ -14,7 +14,7 @@ using namespace std;
 
 
 const int READNUM = 100;
-const int TRAINNUM = 5;
+const int TRAINNUM = 50;
 const double PI = 3.1415926;
 
 void Neural::Test()
@@ -72,11 +72,23 @@ void MatrixNeuralTest()
 	MaNeural* nptr = new MaNeural(&units[0], 0.1, NULL);
 	nptr->Init(nSample);
 	nptr->GenerateWeight();
-	nptr->TrainSet(xptr, yptr, TRAINNUM, 0.001, 5000, true, false);
+	nptr->TrainSet(xptr, yptr, TRAINNUM, 0.001, 5000, true, true);
 	for(int i=0;i<nSample;i++)
 	{
 		nptr->PrintTest(xptr+i);
 	}
+}
+
+void TestInverse()
+{
+	CMatrix c1(2,2);
+	c1.m_pTMatrix(0, 0) = 1;
+	c1.m_pTMatrix(0, 1) = 3;
+	c1.m_pTMatrix(1, 0) = 2;
+	c1.m_pTMatrix(1, 1) = 5;
+
+	c1.Print();
+	c1.Inverse().Print();
 }
 
 int main()
@@ -87,18 +99,9 @@ int main()
 
 	//freopen("out.txt", "w", stdout);
 	//freopen("out.txt", "w", stderr);
-	MatrixNeuralTest();
+	//MatrixNeuralTest();
     try
     {
-		CMatrix c1(2,2);
-		c1.m_pTMatrix(0, 0) = 1;
-		c1.m_pTMatrix(0, 1) = 3;
-		c1.m_pTMatrix(1, 0) = 2;
-		c1.m_pTMatrix(1, 1) = 5;
-
-		c1.Print();
-		c1.Inverse().Print();
-
 
         Image imageList[READNUM];
 		
@@ -140,7 +143,7 @@ int main()
 			printf("Test Num = %d\n", READNUM - TRAINNUM);
 		}
 		*/
-		/*
+		
 		if(read64("my_optdigits.tra", imageList, READNUM))
 		{
 
@@ -153,11 +156,17 @@ int main()
 			MaNeural* nptr = new MaNeural(&units[0], 0.1, &gen);
 			nptr->Init(TRAINNUM);
 			nptr->GenerateWeight();
-			nptr->TrainSet(imageList, TRAINNUM, 0.001, 80000);
-			nptr->TestSet(imageList, TRAINNUM);
+			double t;
+			TIMEV_START(t);
+			nptr->TrainSet(imageList, TRAINNUM, 0.00001, 5000, true, false);
+			TIMEV_END(t);
+			printf("time = %.6f\n", t);
+
+			int testNum = min(READNUM - TRAINNUM, TRAINNUM / 2);
+			//nptr->TestSet(imageList+TRAINNUM, testNum);
 		}
 
-		*/
+		
     }
     catch(string errs)
     {

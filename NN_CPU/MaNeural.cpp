@@ -69,10 +69,10 @@ void MaNeural::TrainSet(float* input, float* target, int count, float diff, int 
 			this->mDemoOutput.m_pTMatrix(i, j) = target[i + j*this->numInput];
 		}
 
-	TrainSet(count, diff, maxIter, changeEta, deltaWeight);
+	__TrainSet(count, diff, maxIter, changeEta, deltaWeight);
 }
 
-void MaNeural::TrainSet(int count, float diff, int maxIter, bool changeEta, bool deltaWeight)
+void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bool deltaWeight)
 {
 	Forward(this->mI2HWeight, this->mHideBias, this->mH2OWeight, this->mOutputBias, VERBOSE);
 
@@ -81,16 +81,19 @@ void MaNeural::TrainSet(int count, float diff, int maxIter, bool changeEta, bool
 
 	CMatrix mOutputError(this->numOutput, this->numSample);
 	mOutputError = mDemoOutput - this->mOutOutput;
-
-	cout << "mDemoOutput "<< endl;
-	mDemoOutput.Print();
+	if(VERBOSE)
+	{
+		cout << "mDemoOutput "<< endl;
+		mDemoOutput.Print();
+	}
+	
 	//cout << "mOutputError" << endl;
 	//mOutputError.Print();
 
-
+	float sysErrNew;
 	float sysErrOld = mOutputError.GetSystemError();
-
-	for(int nLoopTimes=1; nLoopTimes < maxIter; nLoopTimes++)	
+	int nLoopTimes;
+	for(nLoopTimes=1; nLoopTimes < maxIter; nLoopTimes++)	
 	{
 		//printf("loop = %d\n", nLoopTimes);
 		if(sysErrOld < diff)
@@ -195,7 +198,7 @@ void MaNeural::TrainSet(int count, float diff, int maxIter, bool changeEta, bool
 
 
 		cMatrixNewOutputLayerError = mDemoOutput - this->mOutOutput;;
-		float sysErrNew =	cMatrixNewOutputLayerError.GetSystemError ();
+		sysErrNew =	cMatrixNewOutputLayerError.GetSystemError ();
 
 		mOutputError = cMatrixNewOutputLayerError;
 
@@ -205,6 +208,7 @@ void MaNeural::TrainSet(int count, float diff, int maxIter, bool changeEta, bool
 
 		if(sysErrNew < sysErrOld)
 		{
+			//printf("Save\n");
 			//save
 			this->s_mI2HWeight = this->mI2HWeight;
 			this->s_mH2OWeight = this->mH2OWeight;
@@ -221,6 +225,7 @@ void MaNeural::TrainSet(int count, float diff, int maxIter, bool changeEta, bool
 		else if(sysErrNew > sysErrOld * 1.04 )
 		{
 			//restore
+			//printf("Restore\n");
 			this->mI2HWeight = this->s_mI2HWeight;
 			this->mH2OWeight = this->s_mH2OWeight;
 			//alpha = 0;
@@ -228,16 +233,20 @@ void MaNeural::TrainSet(int count, float diff, int maxIter, bool changeEta, bool
 			if (changeEta)
 			{
 				float newEta = this->eta* 0.7;
-				this->eta *= newEta > 0.01 ? newEta : this->eta;
+				this->eta = newEta > 0.01 ? newEta : this->eta;
 			}
 			
 		}
-
+		
+		
 		printf("loop = %d, New = %.6f, Old = %.6f, eta = %.4f\n", nLoopTimes, sysErrNew, sysErrOld, this->eta);
+		
 
 
 
 	}
+
+	printf("Iter = %d, Err = %.6f\n", nLoopTimes, sysErrNew);
 }
 
 void MaNeural::TrainSet(Image* imageList, int count, float diff, int maxIter, bool changeEta, bool deltaWeight)
@@ -277,7 +286,7 @@ void MaNeural::TrainSet(Image* imageList, int count, float diff, int maxIter, bo
 	}
 
 
-	TrainSet(count, diff, maxIter, changeEta, deltaWeight);
+	__TrainSet(count, diff, maxIter, changeEta, deltaWeight);
 }
 
 void MaNeural::PrintTest(float* input)
@@ -302,7 +311,7 @@ void MaNeural::PrintTest(float* input)
 
 void MaNeural::Forward(CMatrix& _mI2HWeight, CMatrix& _mHideBias, CMatrix& _mH2OWeight, CMatrix& _mOutputBias, bool verbose)
 {
-	printf("Forward ...\n");
+	//printf("Forward ...\n");
 	CMatrix cMExHideBias;
 	cMExHideBias.nncpyi(_mHideBias, this->numSample);
 	//cout << "_mHideBias" << endl;
@@ -327,7 +336,7 @@ void MaNeural::Forward(CMatrix& _mI2HWeight, CMatrix& _mHideBias, CMatrix& _mH2O
 	//cMHidePureInput.Print();
 
 
-	//cMHidePureInput += cMExHideBias;
+	cMHidePureInput += cMExHideBias;
 
 
 	//cout << "cMHidePureInput" << endl;
@@ -365,7 +374,7 @@ void MaNeural::Forward(CMatrix& _mI2HWeight, CMatrix& _mHideBias, CMatrix& _mH2O
 	//cout << "cMOutPureInput" << endl;
 	//cMOutPureInput.Print();
 
-	//cMOutPureInput += cMExOutputBias;
+	cMOutPureInput += cMExOutputBias;
 
 
 	//cout << "cMOutPureInput" << endl;
@@ -378,4 +387,42 @@ void MaNeural::Forward(CMatrix& _mI2HWeight, CMatrix& _mHideBias, CMatrix& _mH2O
 		this->mOutOutput.Print();
 	}
 	
+}
+
+
+bool MaNeural::Test(float* input, int label)
+{
+	this->numSample = 1;
+	this->mInputValue.Resize(this->numInput, 1);
+
+	for(int i=0;i<this->numInput;i++)
+	{
+		this->mInputValue.m_pTMatrix(i, 0) = input[i];
+	}
+	Forward(this->mI2HWeight, this->mHideBias, this->mH2OWeight, this->mOutputBias);
+
+	float* output = new float[this->numOutput];
+	for(int i=0;i<this->numOutput;i++)
+	{
+		output[i] = this->mOutOutput.m_pTMatrix(i, 0);
+	}
+
+	int predict = tarptr->Check(output);
+
+	printf("%d -> %d\n", label, predict);
+	delete[] output;
+	return label == predict;
+}
+
+void MaNeural::TestSet(Image* imageList, int count)
+{
+	int right = 0;
+	for(int i=0;i<count;i++)
+	{
+		if(Test(imageList[i].content, imageList[i].label))
+		{
+			right++;
+		}
+	}
+	printf("Correct percent = %.3f%%\n", ((float)(right*100))/count);
 }

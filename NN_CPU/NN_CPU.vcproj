@@ -85,6 +85,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy $(OutDir)\$(ProjectName).exe $(ProjectName)_$(ConfigurationName).exe"
 			/>
 		</Configuration>
 		<Configuration
@@ -129,7 +130,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkIncremental="2"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -155,6 +156,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy $(OutDir)\$(ProjectName).exe $(ProjectName)_$(ConfigurationName).exe"
 			/>
 		</Configuration>
 	</Configurations>
@@ -196,10 +198,6 @@
 			</File>
 			<File
 				RelativePath=".\Reader.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SpecialRead.h"
 				>
 			</File>
 			<File

@@ -19,7 +19,7 @@ public:
 		TrainSet(imageList, count, diff, maxIter, false, false);
 	}
 	void TrainSet(float* input, float* target, int count, float diff, int maxIter, bool changeEta, bool deltaWeight);
-	void TrainSet(int count, float diff, int maxIter, bool changeEta, bool deltaWeight);
+	
 	void TrainSet(Image* imageList, int count, float diff, int maxIter, bool changeEta, bool deltaWeight);
 
 
@@ -32,9 +32,12 @@ public:
 
 	void PrintTest(float* input);
 
+	virtual bool Test(float* input, int label);
+	virtual void TestSet(Image* imageList, int count);
+
 	TargetGenBase* tarptr;
 protected:
-
+	void __TrainSet(int count, float diff, int maxIter, bool changeEta, bool deltaWeight);
 	//void Forward(CMatrix& mI2HWeight, CMatrix& mHideBias, CMatrix& mH2OWeight, CMatrix& mOutputBias);
 
 	int* units;

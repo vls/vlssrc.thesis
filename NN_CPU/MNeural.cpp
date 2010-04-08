@@ -384,14 +384,14 @@ bool MNeural::Test(float* input, int label)
 	
 	for(int i=0;i<this->numInput;i++)
 	{
-		this->mInputValue.m_pTMatrix(i, 1) = input[i];
+		this->mInputValue.m_pTMatrix(i, 0) = input[i];
 	}
     Forward(this->mI2HWeight, this->mHideBias, this->mH2OWeight, this->mOutputBias);
 
 	float* output = new float[this->numOutput];
 	for(int i=0;i<this->numOutput;i++)
 	{
-		output[i] = this->mOutOutput.m_pTMatrix(i, 1);
+		output[i] = this->mOutOutput.m_pTMatrix(i, 0);
 	}
 
 	int predict = tarptr->Check(output);
