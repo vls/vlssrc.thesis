@@ -1,6 +1,8 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NN_GPU30", "NN_GPU30.vcproj", "{562DB75F-8C73-4AED-9914-99AFAE9AD44D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NN_GPU", "NN_GPU30\NN_GPU30.vcproj", "{562DB75F-8C73-4AED-9914-99AFAE9AD44D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NN_GPU_DLL", "NN_GPU_DLL\NN_GPU_DLL.vcproj", "{4C2D39E4-3AAC-4032-B913-5FB0584BF840}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +32,18 @@ Global
 		{562DB75F-8C73-4AED-9914-99AFAE9AD44D}.Release|Win32.Build.0 = Release|Win32
 		{562DB75F-8C73-4AED-9914-99AFAE9AD44D}.Release|x64.ActiveCfg = Release|x64
 		{562DB75F-8C73-4AED-9914-99AFAE9AD44D}.Release|x64.Build.0 = Release|x64
+		{4C2D39E4-3AAC-4032-B913-5FB0584BF840}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4C2D39E4-3AAC-4032-B913-5FB0584BF840}.Debug|Win32.Build.0 = Debug|Win32
+		{4C2D39E4-3AAC-4032-B913-5FB0584BF840}.Debug|x64.ActiveCfg = Debug|Win32
+		{4C2D39E4-3AAC-4032-B913-5FB0584BF840}.EmuDebug|Win32.ActiveCfg = Debug|Win32
+		{4C2D39E4-3AAC-4032-B913-5FB0584BF840}.EmuDebug|Win32.Build.0 = Debug|Win32
+		{4C2D39E4-3AAC-4032-B913-5FB0584BF840}.EmuDebug|x64.ActiveCfg = Debug|Win32
+		{4C2D39E4-3AAC-4032-B913-5FB0584BF840}.EmuRelease|Win32.ActiveCfg = Release|Win32
+		{4C2D39E4-3AAC-4032-B913-5FB0584BF840}.EmuRelease|Win32.Build.0 = Release|Win32
+		{4C2D39E4-3AAC-4032-B913-5FB0584BF840}.EmuRelease|x64.ActiveCfg = Release|Win32
+		{4C2D39E4-3AAC-4032-B913-5FB0584BF840}.Release|Win32.ActiveCfg = Release|Win32
+		{4C2D39E4-3AAC-4032-B913-5FB0584BF840}.Release|Win32.Build.0 = Release|Win32
+		{4C2D39E4-3AAC-4032-B913-5FB0584BF840}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
