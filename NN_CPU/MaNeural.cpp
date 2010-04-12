@@ -5,7 +5,7 @@ const int _NUMLAYER = 3;
 #define VERBOSE false
 using namespace std;
 
-
+int forwardCount = 0;
 MaNeural::MaNeural(int* units, float eta, TargetGenBase* tarptr)
 {
 	this->units = units;
@@ -42,14 +42,23 @@ void MaNeural::Init(int numSample)
 
 	this->mOutputBias.Resize(numOutput, 1);
 
+	for (int i = 0;i<mHideBias.GetRowCount();i++)
+	{
+		mHideBias.m_pTMatrix(i,0) = 1.0f;
+	}
+
+	for (int i = 0;i<mOutputBias.GetRowCount();i++)
+	{
+		mOutputBias.m_pTMatrix(i,0) = 1.0f;
+	}
+
 }
 
 void MaNeural::GenerateWeight()
 {
 	this->mI2HWeight.RandomInitialize(HIGH, LOW);
 	this->mH2OWeight.RandomInitialize(HIGH, LOW);
-	this->mHideBias.RandomInitialize(HIGH, LOW);
-	this->mOutputBias.RandomInitialize(HIGH, LOW);
+	
 }
 
 void MaNeural::TrainSet(float* input, float* target, int count, float diff, int maxIter, bool changeEta, bool deltaWeight)
@@ -74,13 +83,17 @@ void MaNeural::TrainSet(float* input, float* target, int count, float diff, int 
 
 void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bool deltaWeight)
 {
-	Forward(this->mI2HWeight, this->mHideBias, this->mH2OWeight, this->mOutputBias, VERBOSE);
-
-
-
-
+	forwardCount = 0;
 	CMatrix mOutputError(this->numOutput, this->numSample);
+
+
+	Forward(this->mI2HWeight, this->mHideBias, this->mH2OWeight, this->mOutputBias, VERBOSE);
 	mOutputError = mDemoOutput - this->mOutOutput;
+	float sysErrOld = mOutputError.GetSystemError();
+
+	this->s_mI2HWeight = this->mI2HWeight;
+	this->s_mH2OWeight = this->mH2OWeight;
+
 	if(VERBOSE)
 	{
 		cout << "mDemoOutput "<< endl;
@@ -91,7 +104,7 @@ void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bo
 	//mOutputError.Print();
 
 	float sysErrNew;
-	float sysErrOld = mOutputError.GetSystemError();
+	
 	int nLoopTimes;
 	for(nLoopTimes=1; nLoopTimes < maxIter; nLoopTimes++)	
 	{
@@ -120,12 +133,18 @@ void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bo
 
 		// 定义新的输入层到隐含层的权值
 		CMatrix mNewI2HWeight (this->mI2HWeight.GetRowCount(), this->mI2HWeight.GetColCount());
+
+		/*
 		// 定义的新的隐含层的阀值
 		CMatrix mNewHideBias (this->numHidden, this->numSample);
+		*/
 		// 定义新的隐含层到输出层的权值
 		CMatrix mNewH2OWeight (this->mH2OWeight.GetRowCount(), this->mH2OWeight.GetColCount());
+
+		/*
 		// 定义新的输出层的阀值
 		CMatrix mNewOutputBias (this->numOutput, this->numSample);
+		*/
 		// 定义新的误差矩阵
 		CMatrix cMatrixNewOutputLayerError(this->numOutput, this->numSample);
 
@@ -134,13 +153,13 @@ void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bo
 		mNewH2OWeight = mOutDelta * (this->mHideOutput.Transpose ()) * (this->eta);
 
 
-		mNewOutputBias = mOutDelta * this->eta;//这里阀值的改变没有*nStep
+		//mNewOutputBias = mOutDelta * this->eta;//这里阀值的改变没有*nStep
 
 		mNewI2HWeight = mHideDelta * (this->mInputValue.Transpose ()) * (this->eta);
 
 
 
-		mNewHideBias = mHideDelta * this->eta;
+		//mNewHideBias = mHideDelta * this->eta;
 
 		// 赋值
 		this->mI2HWeight += mNewI2HWeight;
@@ -172,7 +191,7 @@ void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bo
 		}
 
 
-
+		/*
 		CMatrix tempHideBias(this->numHidden, 1);
 		mNewHideBias.CopySubMatrix(tempHideBias, 0, mNewHideBias.GetColCount() - 1);
 		tempHideBias += this->mHideBias;
@@ -180,7 +199,7 @@ void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bo
 		CMatrix tempOutputBias(this->numOutput, 1);
 		mNewOutputBias.CopySubMatrix(tempOutputBias, 0, mNewOutputBias.GetColCount() - 1);
 		tempOutputBias += this->mOutputBias;
-
+		*/
 
 
 
@@ -194,18 +213,16 @@ void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bo
 
 
 		// 前向计算
-		Forward(this->mI2HWeight, tempHideBias, this->mH2OWeight, tempOutputBias, VERBOSE);
+		Forward(this->mI2HWeight, this->mHideBias, this->mH2OWeight, this->mOutputBias, VERBOSE);
 
 
-		cMatrixNewOutputLayerError = mDemoOutput - this->mOutOutput;;
-		sysErrNew =	cMatrixNewOutputLayerError.GetSystemError ();
-
-		mOutputError = cMatrixNewOutputLayerError;
+		mOutputError = mDemoOutput - this->mOutOutput;;
+		sysErrNew =	mOutputError.GetSystemError ();
 
 		alpha = this->alpha;
 
 
-
+		bool restore = false;
 		if(sysErrNew < sysErrOld)
 		{
 			//printf("Save\n");
@@ -225,10 +242,17 @@ void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bo
 		else if(sysErrNew > sysErrOld * 1.04 )
 		{
 			//restore
+			restore = true;
 			//printf("Restore\n");
 			this->mI2HWeight = this->s_mI2HWeight;
 			this->mH2OWeight = this->s_mH2OWeight;
 			//alpha = 0;
+			
+			CMatrix tempError(this->numOutput, this->numSample);
+			Forward(this->mI2HWeight, this->mHideBias, this->mH2OWeight, this->mOutputBias, VERBOSE);
+			mOutputError = mDemoOutput - this->mOutOutput;
+			float sysErrSpe = mOutputError.GetSystemError();
+			//printf("Special err = %.6f\n", sysErrSpe);
 
 			if (changeEta)
 			{
@@ -239,7 +263,9 @@ void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bo
 		}
 		
 		
-		printf("loop = %d, New = %.6f, Old = %.6f, eta = %.4f\n", nLoopTimes, sysErrNew, sysErrOld, this->eta);
+		#ifdef _DEBUG
+printf("loop = %d, New = %.6f, Old = %.6f, eta = %.4f %s\n", nLoopTimes, sysErrNew, sysErrOld, this->eta, restore ? "---RESTORE" : "");
+#endif // _DEBUG
 		
 
 
@@ -247,6 +273,7 @@ void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bo
 	}
 
 	printf("Iter = %d, Err = %.6f\n", nLoopTimes, sysErrNew);
+	printf("Forward Count = %d\n", forwardCount);
 }
 
 void MaNeural::TrainSet(Image* imageList, int count, float diff, int maxIter, bool changeEta, bool deltaWeight)
@@ -311,6 +338,7 @@ void MaNeural::PrintTest(float* input)
 
 void MaNeural::Forward(CMatrix& _mI2HWeight, CMatrix& _mHideBias, CMatrix& _mH2OWeight, CMatrix& _mOutputBias, bool verbose)
 {
+	forwardCount++;
 	//printf("Forward ...\n");
 	CMatrix cMExHideBias;
 	cMExHideBias.nncpyi(_mHideBias, this->numSample);

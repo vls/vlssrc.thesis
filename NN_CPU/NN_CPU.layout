@@ -13,11 +13,14 @@
 	<File name="Layer.h" open="0" top="0" tabpos="6">
 		<Cursor position="305" topLine="0" />
 	</File>
-	<File name="MNeural.cpp" open="1" top="1" tabpos="5">
-		<Cursor position="3255" topLine="123" />
+	<File name="MNeural.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="3174" topLine="123" />
 	</File>
 	<File name="MNeural.h" open="1" top="0" tabpos="4">
 		<Cursor position="397" topLine="6" />
+	</File>
+	<File name="MaNeural.cpp" open="1" top="1" tabpos="11">
+		<Cursor position="4341" topLine="156" />
 	</File>
 	<File name="Matrix.cpp" open="1" top="0" tabpos="2">
 		<Cursor position="8611" topLine="312" />

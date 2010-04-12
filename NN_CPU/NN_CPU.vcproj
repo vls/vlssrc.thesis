@@ -129,7 +129,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="cutil32.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="$(CUDA_LIB_PATH)/../lib;../../common/lib;../../../shared/lib"
 				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"

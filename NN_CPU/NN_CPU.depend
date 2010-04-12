@@ -6,7 +6,7 @@
 	"Reader.h"
 	"Image.h"
 
-1269424943 source:i:\temp\nn_cpu\main.cpp
+1270742181 source:i:\temp\nn_cpu\main.cpp
 	<iostream>
 	"Neural.h"
 	"Layer.h"
@@ -16,12 +16,15 @@
 	<string.h>
 	"Matrix.h"
 	"MNeural.h"
+	"MaNeural.h"
+	"Tools.h"
+	"getopt.h"
 
 1268468546 i:\temp\nn_cpu\neural.cpp
 	"Neural.h"
 	<iostream>
 
-1269412956 i:\temp\nn_cpu\neural.h
+1270128801 i:\temp\nn_cpu\neural.h
 	"global.h"
 	"Layer.h"
 	<math.h>
@@ -2906,9 +2909,11 @@
 	<boost/type_traits/detail/bool_trait_def.hpp>
 	<boost/type_traits/detail/bool_trait_undef.hpp>
 
-1269425945 i:\temp\nn_cpu\global.h
-	"boost/multi_array.hpp"
-	"boost/array.hpp"
+1270386249 i:\temp\nn_cpu\global.h
+	<boost/multi_array.hpp>
+	<boost/array.hpp>
+	<boost/numeric/ublas/matrix.hpp>
+	<boost/numeric/ublas/lu.hpp>
 	"windows.h"
 
 1268469127 i:\temp\nn_cpu\layer.cpp
@@ -2921,7 +2926,7 @@
 	"Layer.h"
 	<iostream>
 
-1269412964 source:i:\temp\nn_cpu\neural.cpp
+1270380947 source:i:\temp\nn_cpu\neural.cpp
 	"Neural.h"
 	<iostream>
 	<math.h>
@@ -2965,13 +2970,12 @@
 1268551625 source:i:\document\my documents\大学作业\论文\src\nn_cpu\image.cpp
 	"Image.h"
 
-1269424905 source:i:\temp\nn_cpu\reader.cpp
+1270126554 source:i:\temp\nn_cpu\reader.cpp
 	"Reader.h"
 	<iostream>
 	<stdio.h>
 
-1269424962 i:\temp\nn_cpu\reader.h
-	"global.h"
+1270644594 i:\temp\nn_cpu\reader.h
 	"Image.h"
 	<stdio.h>
 
@@ -2980,32 +2984,733 @@
 1268551625 source:i:\temp\nn_cpu\image.cpp
 	"Image.h"
 
-1269239550 source:i:\temp\nn_cpu\dneural.cpp
+1270127040 source:i:\temp\nn_cpu\dneural.cpp
 	"Neural.h"
 	<iostream>
 
-1268653244 i:\temp\nn_cpu\targetgen.h
+1270387010 i:\temp\nn_cpu\targetgen.h
 	"global.h"
 
-1268670577 source:i:\temp\nn_cpu\targetgen.cpp
+1270387010 source:i:\temp\nn_cpu\targetgen.cpp
 	"TargetGen.h"
 	"Neural.h"
 
-1269407924 i:\temp\nn_cpu\matrix.h
+1269579593 i:\temp\nn_cpu\matrix.h
 	"global.h"
 
-1269425313 source:i:\temp\nn_cpu\mneural.cpp
+1270715750 source:i:\temp\nn_cpu\mneural.cpp
 	"MNeural.h"
+	<iostream>
 
-1269407901 i:\temp\nn_cpu\mneural.h
+1270381348 i:\temp\nn_cpu\mneural.h
 	"Neural.h"
 	"Matrix.h"
 
-1269425013 source:i:\temp\nn_cpu\matrix.cpp
+1270450134 source:i:\temp\nn_cpu\matrix.cpp
 	<iostream>
 	"Matrix.h"
 	<math.h>
 	<stdlib.h>
 	<conio.h>
 	<stdio.h>
+
+1268461900 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\matrix.hpp
+	<boost/numeric/ublas/vector.hpp>
+	<boost/numeric/ublas/matrix_expression.hpp>
+	<boost/numeric/ublas/detail/matrix_assign.hpp>
+	<boost/serialization/collection_size_type.hpp>
+	<boost/serialization/array.hpp>
+	<boost/serialization/nvp.hpp>
+
+1268461900 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\vector.hpp
+	<boost/numeric/ublas/storage.hpp>
+	<boost/numeric/ublas/vector_expression.hpp>
+	<boost/numeric/ublas/detail/vector_assign.hpp>
+	<boost/serialization/collection_size_type.hpp>
+	<boost/serialization/nvp.hpp>
+
+1268461900 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\storage.hpp
+	<algorithm>
+	<boost/shared_array.hpp>
+	<boost/serialization/array.hpp>
+	<boost/serialization/collection_size_type.hpp>
+	<boost/serialization/nvp.hpp>
+	<boost/numeric/ublas/exception.hpp>
+	<boost/numeric/ublas/traits.hpp>
+	<boost/numeric/ublas/detail/iterator.hpp>
+
+1268461761 d:\software\program files\codeblocks\include\boost-1_42\boost\shared_array.hpp
+	<boost/smart_ptr/shared_array.hpp>
+
+1268461822 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\shared_array.hpp
+	<boost/config.hpp>
+	<boost/smart_ptr/detail/shared_array_nmt.hpp>
+	<memory>
+	<boost/assert.hpp>
+	<boost/checked_delete.hpp>
+	<boost/smart_ptr/detail/shared_count.hpp>
+	<boost/detail/workaround.hpp>
+	<cstddef>
+	<algorithm>
+	<functional>
+	<boost/smart_ptr/detail/operator_bool.hpp>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\shared_array_nmt.hpp
+	<boost/assert.hpp>
+	<boost/checked_delete.hpp>
+	<boost/throw_exception.hpp>
+	<boost/smart_ptr/detail/atomic_count.hpp>
+	<cstddef>
+	<algorithm>
+	<functional>
+	<new>
+
+1268461922 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\atomic_count.hpp
+	<boost/config.hpp>
+	<boost/smart_ptr/detail/sp_has_sync.hpp>
+	<boost/smart_ptr/detail/atomic_count_pthreads.hpp>
+	<boost/smart_ptr/detail/atomic_count_gcc_x86.hpp>
+	<boost/smart_ptr/detail/atomic_count_win32.hpp>
+	<boost/smart_ptr/detail/atomic_count_sync.hpp>
+	<boost/smart_ptr/detail/atomic_count_gcc.hpp>
+	<boost/smart_ptr/detail/atomic_count_pthreads.hpp>
+
+1268461924 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\sp_has_sync.hpp
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\atomic_count_pthreads.hpp
+	<pthread.h>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\atomic_count_gcc_x86.hpp
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\atomic_count_win32.hpp
+	<boost/detail/interlocked.hpp>
+
+1268461774 d:\software\program files\codeblocks\include\boost-1_42\boost\detail\interlocked.hpp
+	<boost/config.hpp>
+	<windows.h>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\atomic_count_sync.hpp
+	<ia64intrin.h>
+
+1268461922 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\atomic_count_gcc.hpp
+	<ext/atomicity.h>
+	<bits/atomicity.h>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\shared_count.hpp
+	<boost/config.hpp>
+	<boost/checked_delete.hpp>
+	<boost/throw_exception.hpp>
+	<boost/smart_ptr/bad_weak_ptr.hpp>
+	<boost/smart_ptr/detail/sp_counted_base.hpp>
+	<boost/smart_ptr/detail/sp_counted_impl.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/config/no_tr1/memory.hpp>
+	<functional>
+	<new>
+
+1268461821 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\bad_weak_ptr.hpp
+	<exception>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\sp_counted_base.hpp
+	<boost/config.hpp>
+	<boost/smart_ptr/detail/sp_has_sync.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_nt.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_spin.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_pt.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_nt.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_gcc_x86.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_gcc_ia64.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_acc_ia64.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_cw_ppc.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_gcc_ppc.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_gcc_mips.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_sync.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_gcc_sparc.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_w32.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_nt.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_spin.hpp>
+
+1268461924 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\sp_counted_base_nt.hpp
+	<boost/detail/sp_typeinfo.hpp>
+
+1268461775 d:\software\program files\codeblocks\include\boost-1_42\boost\detail\sp_typeinfo.hpp
+	<boost/config.hpp>
+	<boost/current_function.hpp>
+	<functional>
+	<typeinfo>
+
+1268461924 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\sp_counted_base_spin.hpp
+	<boost/detail/sp_typeinfo.hpp>
+	<boost/smart_ptr/detail/spinlock_pool.hpp>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\spinlock_pool.hpp
+	<boost/config.hpp>
+	<boost/smart_ptr/detail/spinlock.hpp>
+	<cstddef>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\spinlock.hpp
+	<boost/config.hpp>
+	<boost/smart_ptr/detail/sp_has_sync.hpp>
+	<boost/smart_ptr/detail/spinlock_gcc_arm.hpp>
+	<boost/smart_ptr/detail/spinlock_sync.hpp>
+	<boost/smart_ptr/detail/spinlock_w32.hpp>
+	<boost/smart_ptr/detail/spinlock_pt.hpp>
+	<boost/smart_ptr/detail/spinlock_nt.hpp>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\spinlock_gcc_arm.hpp
+	<boost/smart_ptr/detail/yield_k.hpp>
+
+1268461924 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\yield_k.hpp
+	<boost/config.hpp>
+	<windows.h>
+	<sched.h>
+	<time.h>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\spinlock_sync.hpp
+	<boost/smart_ptr/detail/yield_k.hpp>
+	<ia64intrin.h>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\spinlock_w32.hpp
+	<boost/detail/interlocked.hpp>
+	<boost/smart_ptr/detail/yield_k.hpp>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\spinlock_pt.hpp
+	<pthread.h>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\spinlock_nt.hpp
+	<boost/assert.hpp>
+
+1268461924 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\sp_counted_base_pt.hpp
+	<boost/detail/sp_typeinfo.hpp>
+	<pthread.h>
+
+1268461924 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\sp_counted_base_gcc_x86.hpp
+	<boost/detail/sp_typeinfo.hpp>
+
+1268461924 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\sp_counted_base_gcc_ia64.hpp
+	<boost/detail/sp_typeinfo.hpp>
+
+1268461924 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\sp_counted_base_acc_ia64.hpp
+	<boost/detail/sp_typeinfo.hpp>
+	<machine/sys/inline.h>
+
+1268461924 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\sp_counted_base_cw_ppc.hpp
+	<boost/detail/sp_typeinfo.hpp>
+
+1268461924 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\sp_counted_base_gcc_ppc.hpp
+	<boost/detail/sp_typeinfo.hpp>
+
+1268461924 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\sp_counted_base_gcc_mips.hpp
+	<boost/detail/sp_typeinfo.hpp>
+
+1268461924 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\sp_counted_base_sync.hpp
+	<boost/detail/sp_typeinfo.hpp>
+	<limits.h>
+	<ia64intrin.h>
+
+1268461924 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\sp_counted_base_gcc_sparc.hpp
+	<boost/detail/sp_typeinfo.hpp>
+	<inttypes.h>
+
+1268461924 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\sp_counted_base_w32.hpp
+	<boost/detail/interlocked.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/detail/sp_typeinfo.hpp>
+
+1268461924 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\sp_counted_impl.hpp
+	<boost/config.hpp>
+	<boost/checked_delete.hpp>
+	<boost/smart_ptr/detail/sp_counted_base.hpp>
+	<boost/smart_ptr/detail/quick_allocator.hpp>
+	<memory>
+	<cstddef>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\quick_allocator.hpp
+	<boost/config.hpp>
+	<boost/smart_ptr/detail/lightweight_mutex.hpp>
+	<boost/type_traits/type_with_alignment.hpp>
+	<boost/type_traits/alignment_of.hpp>
+	<new>
+	<cstddef>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\lightweight_mutex.hpp
+	<boost/config.hpp>
+	<boost/smart_ptr/detail/lwm_nop.hpp>
+	<boost/smart_ptr/detail/lwm_pthreads.hpp>
+	<boost/smart_ptr/detail/lwm_win32_cs.hpp>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\lwm_nop.hpp
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\lwm_pthreads.hpp
+	<boost/assert.hpp>
+	<pthread.h>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\lwm_win32_cs.hpp
+	<windows.h>
+
+1268461853 d:\software\program files\codeblocks\include\boost-1_42\boost\config\no_tr1\memory.hpp
+	<memory>
+
+1268461923 d:\software\program files\codeblocks\include\boost-1_42\boost\smart_ptr\detail\operator_bool.hpp
+
+1268461817 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\array.hpp
+	<iostream>
+	<cstddef>
+	<cstddef>
+	<boost/config.hpp>
+	<boost/serialization/nvp.hpp>
+	<boost/serialization/split_member.hpp>
+	<boost/serialization/wrapper.hpp>
+	<boost/mpl/always.hpp>
+	<boost/mpl/apply.hpp>
+	<boost/mpl/bool.hpp>
+	<boost/type_traits/remove_const.hpp>
+	<boost/array.hpp>
+
+1268461818 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\nvp.hpp
+	<utility>
+	<boost/config.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/mpl/integral_c.hpp>
+	<boost/mpl/integral_c_tag.hpp>
+	<boost/serialization/level.hpp>
+	<boost/serialization/tracking.hpp>
+	<boost/serialization/split_member.hpp>
+	<boost/serialization/base_object.hpp>
+	<boost/serialization/traits.hpp>
+	<boost/serialization/wrapper.hpp>
+	<boost/preprocessor/stringize.hpp>
+
+1268461818 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\level.hpp
+	<boost/config.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/type_traits/is_fundamental.hpp>
+	<boost/type_traits/is_enum.hpp>
+	<boost/type_traits/is_array.hpp>
+	<boost/type_traits/is_class.hpp>
+	<boost/type_traits/is_base_and_derived.hpp>
+	<boost/mpl/eval_if.hpp>
+	<boost/mpl/int.hpp>
+	<boost/mpl/integral_c.hpp>
+	<boost/mpl/integral_c_tag.hpp>
+	<boost/mpl/aux_/nttp_decl.hpp>
+	<boost/serialization/level_enum.hpp>
+
+1268461818 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\level_enum.hpp
+
+1268461819 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\tracking.hpp
+	<boost/config.hpp>
+	<boost/static_assert.hpp>
+	<boost/mpl/eval_if.hpp>
+	<boost/mpl/identity.hpp>
+	<boost/mpl/int.hpp>
+	<boost/mpl/equal_to.hpp>
+	<boost/mpl/greater.hpp>
+	<boost/mpl/integral_c_tag.hpp>
+	<boost/type_traits/is_base_and_derived.hpp>
+	<boost/type_traits/is_pointer.hpp>
+	<boost/serialization/level.hpp>
+	<boost/serialization/tracking_enum.hpp>
+	<boost/serialization/type_info_implementation.hpp>
+
+1268461796 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\equal_to.hpp
+	<boost/mpl/aux_/comparison_op.hpp>
+
+1268461797 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\greater.hpp
+	<boost/mpl/aux_/comparison_op.hpp>
+
+1268461819 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\tracking_enum.hpp
+
+1268461819 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\type_info_implementation.hpp
+	<boost/config.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/static_assert.hpp>
+	<boost/mpl/eval_if.hpp>
+	<boost/mpl/identity.hpp>
+	<boost/type_traits/is_base_and_derived.hpp>
+	<boost/serialization/traits.hpp>
+
+1268461819 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\traits.hpp
+	<boost/config.hpp>
+	<boost/static_assert.hpp>
+	<boost/mpl/int.hpp>
+	<boost/mpl/bool.hpp>
+	<boost/serialization/level_enum.hpp>
+	<boost/serialization/tracking_enum.hpp>
+
+1268461819 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\split_member.hpp
+	<boost/config.hpp>
+	<boost/mpl/eval_if.hpp>
+	<boost/mpl/identity.hpp>
+	<boost/serialization/access.hpp>
+
+1268461817 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\access.hpp
+	<boost/config.hpp>
+	<boost/serialization/pfto.hpp>
+
+1268461818 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\pfto.hpp
+	<boost/config.hpp>
+
+1268461817 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\base_object.hpp
+	<boost/config.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/mpl/eval_if.hpp>
+	<boost/mpl/int.hpp>
+	<boost/mpl/bool.hpp>
+	<boost/mpl/identity.hpp>
+	<boost/type_traits/is_base_and_derived.hpp>
+	<boost/type_traits/is_pointer.hpp>
+	<boost/type_traits/is_const.hpp>
+	<boost/type_traits/is_polymorphic.hpp>
+	<boost/static_assert.hpp>
+	<boost/serialization/access.hpp>
+	<boost/serialization/force_include.hpp>
+	<boost/serialization/void_cast_fwd.hpp>
+
+1268461818 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\force_include.hpp
+	<boost/config.hpp>
+
+1268461820 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\void_cast_fwd.hpp
+	<cstddef>
+	<boost/serialization/force_include.hpp>
+
+1268461820 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\wrapper.hpp
+	<boost/serialization/traits.hpp>
+	<boost/type_traits/is_base_and_derived.hpp>
+	<boost/mpl/eval_if.hpp>
+	<boost/mpl/bool.hpp>
+
+1268461818 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\collection_size_type.hpp
+	<boost/serialization/strong_typedef.hpp>
+	<boost/serialization/level.hpp>
+
+1268461819 d:\software\program files\codeblocks\include\boost-1_42\boost\serialization\strong_typedef.hpp
+	<boost/config.hpp>
+	<boost/operators.hpp>
+
+1268461760 d:\software\program files\codeblocks\include\boost-1_42\boost\operators.hpp
+	<boost/config.hpp>
+	<boost/iterator.hpp>
+	<boost/detail/workaround.hpp>
+
+1268461900 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\exception.hpp
+	<stdexcept>
+	<cstdlib>
+	<iostream>
+	<boost/numeric/ublas/detail/config.hpp>
+
+1268462404 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\detail\config.hpp
+	<cassert>
+	<cstddef>
+	<algorithm>
+	<limits>
+	<boost/config.hpp>
+	<boost/static_assert.hpp>
+	<boost/noncopyable.hpp>
+	<boost/mpl/if.hpp>
+	<boost/mpl/and.hpp>
+	<boost/type_traits/is_same.hpp>
+	<boost/type_traits/is_convertible.hpp>
+	<boost/type_traits/is_const.hpp>
+	<boost/type_traits/remove_reference.hpp>
+	<cstdlib>
+	<cstdlib>
+	<boost/numeric/ublas/fwd.hpp>
+	<boost/numeric/ublas/detail/definitions.hpp>
+
+1268461900 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\fwd.hpp
+	<memory>
+
+1268462404 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\detail\definitions.hpp
+
+1268461900 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\traits.hpp
+	<iterator>
+	<complex>
+	<boost/config/no_tr1/cmath.hpp>
+	<boost/numeric/ublas/detail/config.hpp>
+	<boost/numeric/ublas/detail/iterator.hpp>
+	<boost/numeric/ublas/detail/returntype_deduction.hpp>
+	<boost/type_traits.hpp>
+	<complex>
+
+1268461853 d:\software\program files\codeblocks\include\boost-1_42\boost\config\no_tr1\cmath.hpp
+	<cmath>
+
+1268462404 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\detail\iterator.hpp
+	<boost/numeric/ublas/exception.hpp>
+	<iterator>
+
+1268462404 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\detail\returntype_deduction.hpp
+	<boost/mpl/vector/vector20.hpp>
+	<boost/mpl/at.hpp>
+	<boost/mpl/or.hpp>
+	<boost/mpl/identity.hpp>
+	<boost/type_traits/remove_cv.hpp>
+	<boost/type_traits/is_same.hpp>
+	<boost/utility/enable_if.hpp>
+
+1268461896 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\vector20.hpp
+	<boost/mpl/vector/vector10.hpp>
+	<boost/mpl/aux_/config/use_preprocessed.hpp>
+	<boost/mpl/vector/aux_/include_preprocessed.hpp>
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/aux_/config/ctps.hpp>
+	<boost/preprocessor/iterate.hpp>
+
+1268461895 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\vector10.hpp
+	<boost/mpl/vector/vector0.hpp>
+	<boost/mpl/aux_/config/use_preprocessed.hpp>
+	<boost/mpl/vector/aux_/include_preprocessed.hpp>
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/aux_/config/ctps.hpp>
+	<boost/preprocessor/iterate.hpp>
+
+1268461895 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\vector0.hpp
+	<boost/mpl/vector/aux_/at.hpp>
+	<boost/mpl/vector/aux_/front.hpp>
+	<boost/mpl/vector/aux_/push_front.hpp>
+	<boost/mpl/vector/aux_/pop_front.hpp>
+	<boost/mpl/vector/aux_/push_back.hpp>
+	<boost/mpl/vector/aux_/pop_back.hpp>
+	<boost/mpl/vector/aux_/back.hpp>
+	<boost/mpl/vector/aux_/clear.hpp>
+	<boost/mpl/vector/aux_/O1_size.hpp>
+	<boost/mpl/vector/aux_/size.hpp>
+	<boost/mpl/vector/aux_/empty.hpp>
+	<boost/mpl/vector/aux_/item.hpp>
+	<boost/mpl/vector/aux_/iterator.hpp>
+	<boost/mpl/vector/aux_/vector0.hpp>
+	<boost/mpl/vector/aux_/begin_end.hpp>
+	<boost/mpl/vector/aux_/tag.hpp>
+
+1268462401 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\at.hpp
+	<boost/mpl/at_fwd.hpp>
+	<boost/mpl/vector/aux_/tag.hpp>
+	<boost/mpl/long.hpp>
+	<boost/mpl/void.hpp>
+	<boost/mpl/aux_/nttp_decl.hpp>
+	<boost/mpl/aux_/type_wrapper.hpp>
+	<boost/mpl/aux_/value_wknd.hpp>
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/aux_/config/ctps.hpp>
+
+1268462402 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\tag.hpp
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/aux_/nttp_decl.hpp>
+
+1268462396 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\aux_\config\typeof.hpp
+	<boost/mpl/aux_/config/gcc.hpp>
+
+1268462401 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\front.hpp
+	<boost/mpl/front_fwd.hpp>
+	<boost/mpl/vector/aux_/at.hpp>
+	<boost/mpl/vector/aux_/tag.hpp>
+	<boost/mpl/aux_/nttp_decl.hpp>
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/aux_/config/ctps.hpp>
+
+1268461797 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\front_fwd.hpp
+
+1268462401 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\push_front.hpp
+	<boost/mpl/push_front_fwd.hpp>
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/vector/aux_/item.hpp>
+	<boost/mpl/vector/aux_/tag.hpp>
+
+1268461800 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\push_front_fwd.hpp
+
+1268462401 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\item.hpp
+	<boost/mpl/long.hpp>
+	<boost/mpl/void.hpp>
+	<boost/mpl/next_prior.hpp>
+	<boost/mpl/aux_/type_wrapper.hpp>
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/aux_/config/ctps.hpp>
+
+1268462401 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\pop_front.hpp
+	<boost/mpl/pop_front_fwd.hpp>
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/vector/aux_/item.hpp>
+	<boost/mpl/vector/aux_/tag.hpp>
+
+1268461800 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\pop_front_fwd.hpp
+
+1268462401 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\push_back.hpp
+	<boost/mpl/push_back_fwd.hpp>
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/vector/aux_/item.hpp>
+	<boost/mpl/vector/aux_/tag.hpp>
+
+1268461800 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\push_back_fwd.hpp
+
+1268462401 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\pop_back.hpp
+	<boost/mpl/pop_back_fwd.hpp>
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/vector/aux_/item.hpp>
+	<boost/mpl/vector/aux_/tag.hpp>
+
+1268461800 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\pop_back_fwd.hpp
+
+1268462401 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\back.hpp
+	<boost/mpl/back_fwd.hpp>
+	<boost/mpl/next_prior.hpp>
+	<boost/mpl/vector/aux_/at.hpp>
+	<boost/mpl/vector/aux_/tag.hpp>
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/aux_/config/ctps.hpp>
+
+1268461795 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\back_fwd.hpp
+
+1268462401 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\clear.hpp
+	<boost/mpl/clear_fwd.hpp>
+	<boost/mpl/vector/aux_/vector0.hpp>
+	<boost/mpl/vector/aux_/tag.hpp>
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/aux_/config/ctps.hpp>
+
+1268461796 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\clear_fwd.hpp
+
+1268462402 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\vector0.hpp
+	<boost/mpl/long.hpp>
+	<boost/mpl/void.hpp>
+	<boost/mpl/aux_/na.hpp>
+	<boost/mpl/aux_/type_wrapper.hpp>
+	<boost/mpl/vector/aux_/iterator.hpp>
+	<boost/mpl/vector/aux_/tag.hpp>
+	<boost/mpl/aux_/config/typeof.hpp>
+
+1268462401 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\iterator.hpp
+	<boost/mpl/vector/aux_/at.hpp>
+	<boost/mpl/iterator_tags.hpp>
+	<boost/mpl/plus.hpp>
+	<boost/mpl/minus.hpp>
+	<boost/mpl/advance_fwd.hpp>
+	<boost/mpl/distance_fwd.hpp>
+	<boost/mpl/next.hpp>
+	<boost/mpl/prior.hpp>
+	<boost/mpl/aux_/nttp_decl.hpp>
+	<boost/mpl/aux_/value_wknd.hpp>
+	<boost/mpl/aux_/config/ctps.hpp>
+	<boost/mpl/aux_/config/workaround.hpp>
+
+1268461798 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\iterator_tags.hpp
+	<boost/mpl/int.hpp>
+
+1268461799 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\minus.hpp
+	<boost/mpl/aux_/arithmetic_op.hpp>
+
+1268461796 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\distance_fwd.hpp
+	<boost/mpl/aux_/common_name_wknd.hpp>
+
+1268462401 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\o1_size.hpp
+	<boost/mpl/O1_size_fwd.hpp>
+	<boost/mpl/minus.hpp>
+	<boost/mpl/long.hpp>
+	<boost/mpl/vector/aux_/tag.hpp>
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/aux_/config/ctps.hpp>
+
+1268461799 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\o1_size_fwd.hpp
+
+1268462401 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\size.hpp
+	<boost/mpl/size_fwd.hpp>
+	<boost/mpl/vector/aux_/O1_size.hpp>
+	<boost/mpl/vector/aux_/tag.hpp>
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/aux_/config/ctps.hpp>
+
+1268461801 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\size_fwd.hpp
+
+1268462401 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\empty.hpp
+	<boost/mpl/empty_fwd.hpp>
+	<boost/mpl/bool.hpp>
+	<boost/mpl/vector/aux_/tag.hpp>
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/aux_/config/ctps.hpp>
+	<boost/type_traits/is_same.hpp>
+
+1268461796 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\empty_fwd.hpp
+
+1268462401 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\begin_end.hpp
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/begin_end_fwd.hpp>
+	<boost/mpl/vector/aux_/iterator.hpp>
+	<boost/mpl/vector/aux_/tag.hpp>
+
+1268462401 d:\software\program files\codeblocks\include\boost-1_42\boost\mpl\vector\aux_\include_preprocessed.hpp
+	<boost/mpl/aux_/config/typeof.hpp>
+	<boost/mpl/aux_/config/ctps.hpp>
+	<boost/mpl/aux_/config/preprocessor.hpp>
+	<boost/mpl/aux_/config/workaround.hpp>
+	<boost/preprocessor/cat.hpp>
+	<boost/preprocessor/stringize.hpp>
+
+1268461901 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\vector_expression.hpp
+	<boost/numeric/ublas/expression_types.hpp>
+
+1268461900 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\expression_types.hpp
+	<boost/numeric/ublas/exception.hpp>
+	<boost/numeric/ublas/traits.hpp>
+	<boost/numeric/ublas/functional.hpp>
+
+1268461900 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\functional.hpp
+	<functional>
+	<boost/numeric/ublas/traits.hpp>
+	<boost/numeric/ublas/detail/duff.hpp>
+	<boost/numeric/ublas/detail/raw.hpp>
+	<boost/numeric/bindings/traits/std_vector.hpp>
+	<boost/numeric/bindings/traits/ublas_vector.hpp>
+	<boost/numeric/bindings/traits/ublas_matrix.hpp>
+	<boost/numeric/bindings/atlas/cblas.hpp>
+	<boost/numeric/ublas/detail/definitions.hpp>
+
+1268462404 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\detail\duff.hpp
+
+1268462404 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\detail\raw.hpp
+
+1268462404 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\detail\vector_assign.hpp
+	<boost/numeric/ublas/functional.hpp>
+	<vector>
+
+1268461900 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\matrix_expression.hpp
+	<boost/numeric/ublas/vector_expression.hpp>
+
+1268462404 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\detail\matrix_assign.hpp
+	<vector>
+
+1268461900 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\lu.hpp
+	<boost/numeric/ublas/operation.hpp>
+	<boost/numeric/ublas/vector_proxy.hpp>
+	<boost/numeric/ublas/matrix_proxy.hpp>
+	<boost/numeric/ublas/vector.hpp>
+	<boost/numeric/ublas/triangular.hpp>
+
+1268461900 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\operation.hpp
+	<boost/numeric/ublas/matrix_proxy.hpp>
+
+1268461900 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\matrix_proxy.hpp
+	<boost/numeric/ublas/matrix_expression.hpp>
+	<boost/numeric/ublas/detail/vector_assign.hpp>
+	<boost/numeric/ublas/detail/matrix_assign.hpp>
+	<boost/numeric/ublas/detail/temporary.hpp>
+
+1268462404 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\detail\temporary.hpp
+
+1268461901 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\vector_proxy.hpp
+	<boost/numeric/ublas/vector_expression.hpp>
+	<boost/numeric/ublas/detail/vector_assign.hpp>
+	<boost/numeric/ublas/detail/temporary.hpp>
+
+1268461900 d:\software\program files\codeblocks\include\boost-1_42\boost\numeric\ublas\triangular.hpp
+	<boost/numeric/ublas/matrix.hpp>
+	<boost/numeric/ublas/detail/temporary.hpp>
+	<boost/type_traits/remove_const.hpp>
+
+1270715126 i:\temp\nn_cpu\maneural.h
+	"MNeural.h"
+
+1270389605 i:\temp\nn_cpu\tools.h
+
+1270742209 i:\temp\nn_cpu\getopt.h
+	<ctype.h>
 
