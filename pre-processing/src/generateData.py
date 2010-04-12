@@ -32,7 +32,8 @@ def writeBMP(himage, filename):
     
     afterImage = processImage(temphimage).image
     
-    
+    thin = picHandler.thinning(temphimage.image)
+    thin.save(filename + '_thin.bmp', 'BMP')
     
     afterImage.save(filename + '_trim.bmp', 'BMP')
     
@@ -142,13 +143,13 @@ def readData():
                 imaList.append(ima)
     
     print 'begin to writeBMP'
-    for i in range(10):
+    for i in range(20):
         ima = imaList[i]
         
         writeBMP(ima, 'test' + str(i) + '_' + str(ima.label))
     
     print 'total = %d' % (len(imaList))
-    writeFile('image.txt', imaList)
+    #writeFile('image.txt', imaList)
         
 
 
