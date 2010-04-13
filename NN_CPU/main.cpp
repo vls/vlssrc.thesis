@@ -102,25 +102,30 @@ int main(int argc, char** argv)
 
 
 	int iter = 4000;
-	int trainnum = 500;
+	int trainnum = 20;
 	float precision = 0.000001;
-
+	float maxtime = 0.0f;
+	int testnum = 0;
 #ifdef NDEBUG
 	cutGetCmdLineArgumenti(argc,(const char**) argv, "iter", &iter);
 	cutGetCmdLineArgumenti(argc,(const char**) argv, "train", &trainnum);
 	cutGetCmdLineArgumentf(argc,(const char**) argv, "prec", &precision);
+	cutGetCmdLineArgumentf(argc, (const char**) argv, "maxtime", &maxtime);
+	cutGetCmdLineArgumenti(argc,(const char**) argv, "test", &testnum);
+	
+	if(testnum == 0) testnum = trainnum /2;
 #endif // NDEBUG
 
 	printf("Iter = %d\n", iter);
 	printf("TrainNum = %d\n", trainnum);
+	printf("TestNum = %d\n", testnum);
 
     try
     {
-		int readnum = trainnum + trainnum /2;
-        Image* imageList = new Image[readnum];
+        Image* imageList = new Image[trainnum + testnum];
 	
 		
-		if(read64("my_optdigits.tra", imageList, readnum))
+		if(read64("my_optdigits.tra", imageList, trainnum + testnum))
 		{
 			printf("Read samples succeeded. Initializing network...\n");
 			int units[3];
@@ -132,15 +137,15 @@ int main(int argc, char** argv)
 			MaNeural* nptr = new MaNeural(&units[0], 0.1, &gen);
 			nptr->Init(trainnum);
 			nptr->GenerateWeight();
-			double t = 0;
 			printf("Initialized. Begin to work...\n");
-			TIMEV_START(t);
-			nptr->TrainSet(imageList, trainnum, 0.000001, iter, true, false);
-			TIMEV_END(t);
-			printf("time = %.6f\n", t * 1000);
+			
+			nptr->TrainSet(imageList, trainnum, 0.001, iter, true, false, maxtime);
 
-			int testNum = min(readnum - trainnum, trainnum / 2);
-			//nptr->TestSet(imageList+TRAINNUM, testNum);
+			if(testnum != 0)
+			{
+				nptr->TestSet(imageList, testnum);
+			}
+			
 		}
 		
 		delete[] imageList;

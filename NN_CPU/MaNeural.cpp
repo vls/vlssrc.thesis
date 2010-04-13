@@ -81,10 +81,14 @@ void MaNeural::TrainSet(float* input, float* target, int count, float diff, int 
 	__TrainSet(count, diff, maxIter, changeEta, deltaWeight);
 }
 
-void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bool deltaWeight)
+void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bool deltaWeight, float maxtime)
 {
 	forwardCount = 0;
+
+
 	CMatrix mOutputError(this->numOutput, this->numSample);
+	double t;
+	TIMEV_START(t);
 
 
 	Forward(this->mI2HWeight, this->mHideBias, this->mH2OWeight, this->mOutputBias, VERBOSE);
@@ -261,6 +265,17 @@ void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bo
 			}
 			
 		}
+
+		if(maxtime != 0)
+		{
+			TIMEV_END(t);
+			float nowtime = t* 1000;
+			TIMEV_START(t);
+			if(nowtime > maxtime)
+			{
+				break;
+			}
+		}
 		
 		
 		#ifdef _DEBUG
@@ -271,12 +286,14 @@ printf("loop = %d, New = %.6f, Old = %.6f, eta = %.4f %s\n", nLoopTimes, sysErrN
 
 
 	}
+	TIMEV_END(t);
 
 	printf("Iter = %d, Err = %.6f\n", nLoopTimes, sysErrNew);
 	printf("Forward Count = %d\n", forwardCount);
+	printf("Time = %f (ms)\n", t * 1000);
 }
 
-void MaNeural::TrainSet(Image* imageList, int count, float diff, int maxIter, bool changeEta, bool deltaWeight)
+void MaNeural::TrainSet(Image* imageList, int count, float diff, int maxIter, bool changeEta, bool deltaWeight, float maxtime)
 {
 
 	float alpha = this->alpha;
@@ -313,7 +330,7 @@ void MaNeural::TrainSet(Image* imageList, int count, float diff, int maxIter, bo
 	}
 
 
-	__TrainSet(count, diff, maxIter, changeEta, deltaWeight);
+	__TrainSet(count, diff, maxIter, changeEta, deltaWeight, maxtime);
 }
 
 void MaNeural::PrintTest(float* input)
