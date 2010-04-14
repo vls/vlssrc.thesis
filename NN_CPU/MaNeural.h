@@ -67,6 +67,7 @@ protected:
 	CMatrix mOutputBias;
 
 	CMatrix mHideOutput;
+	CMatrix mHideOutEx;
 	CMatrix mOutOutput;
 private:
 	MaNeural(){}

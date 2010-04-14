@@ -9,8 +9,8 @@
 #include "reader.h"
 #include "TargetGen.h"
 
-const float HIGH = 0.9f;
-const float LOW = 0.1f;
+const float HIGH = 1.0f;
+const float LOW = 0.0f;
 
 class Neural
 {

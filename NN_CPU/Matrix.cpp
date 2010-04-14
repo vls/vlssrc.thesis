@@ -1054,6 +1054,38 @@ CMatrix CMatrix::Sigmoid()
 	return cMatrix;
 }
 
+void CMatrix::Sigmoid1()
+{
+
+	for(int i=0; i < m_nRow; i++)
+	{
+		for(int j=0; j < m_nCol; j++)
+		{
+			m_pTMatrix (i, j) = 1 / (1 + exp(-m_pTMatrix (i, j)));
+		}
+
+	}
+}
+
+void CMatrix::SigmoidEx1()
+{
+	for(int i=0; i < m_nRow; i++)
+	{
+		for(int j=0; j < m_nCol; j++)
+		{
+			if(j==m_nCol-1)
+			{
+				m_pTMatrix (i, j) = 1.0f;
+			}
+			else
+			{
+				m_pTMatrix (i, j) = 1 / (1 + exp(-m_pTMatrix (i, j)));
+			}
+			
+		}
+
+	}
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // 对矩阵中所有的元素进行一次非线性变换:
@@ -1219,6 +1251,7 @@ void CMatrix::CopyTo(CMatrix& matrix, int startRow, int startCol)
     }
 }
 
+
 void CMatrix::Print()
 {
 	for(int i=0;i<m_nRow;i++)
@@ -1231,6 +1264,12 @@ void CMatrix::Print()
 		}
 		cout << endl;
 	}
+}
+
+void CMatrix::Print(const char* s)
+{
+	printf("%s\n", s);
+	this->Print();
 }
 
 //***************************************************************************
@@ -1298,7 +1337,36 @@ CMatrix MergeMatrix(CMatrix& cMatrixA,CMatrix& cMatrixB)
 }
 
 
+void Sgemm(float alpha, const CMatrix& A, const CMatrix& B, float beta, CMatrix& C)
+{
+	if( A.GetColCount() != B.GetRowCount() )
+	{
+		throw string("In Sgemm():执行相乘的两个矩阵维数不满足相乘的条件!");
+	}
 
+	if(C.GetRowCount() < A.GetRowCount() || C.GetColCount() < B.GetColCount())
+	{
+		throw string("目标矩阵不能容纳乘积矩阵\n");
+	}
+
+
+
+	for(int i=0; i < A.GetRowCount(); i++)
+	{
+		//printf("Row = %d/%d\n", i, m_nRow);
+		for(int j=0; j < B.GetColCount(); j++)
+		{
+			VALTYPE sum = 0;
+			for(int m=0; m < A.GetColCount(); m++)
+			{
+				sum += alpha * A.m_pTMatrix(i,m) * B.m_pTMatrix(m,j);
+				//printf("%f\t%f\n", A.m_pTMatrix(i,m), B.m_pTMatrix(m,j));
+			}
+			C.m_pTMatrix(i,j) = sum + beta * C.m_pTMatrix(i,j);
+			//printf("---\n");
+		}
+	}
+}
 
 // End of ordinary function
 //***************************************************************************

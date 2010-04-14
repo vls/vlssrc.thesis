@@ -101,7 +101,7 @@ int main(int argc, char** argv)
 	//MatrixNeuralTest();
 
 
-	int iter = 4000;
+	int iter = 1000;
 	int trainnum = 20;
 	float precision = 0.000001;
 	float maxtime = 0.0f;
@@ -113,12 +113,13 @@ int main(int argc, char** argv)
 	cutGetCmdLineArgumentf(argc, (const char**) argv, "maxtime", &maxtime);
 	cutGetCmdLineArgumenti(argc,(const char**) argv, "test", &testnum);
 	
-	if(testnum == 0) testnum = trainnum /2;
+	
 #endif // NDEBUG
-
+	if(testnum == 0) testnum = trainnum /2;
 	printf("Iter = %d\n", iter);
 	printf("TrainNum = %d\n", trainnum);
 	printf("TestNum = %d\n", testnum);
+
 
     try
     {
@@ -138,9 +139,15 @@ int main(int argc, char** argv)
 			nptr->Init(trainnum);
 			nptr->GenerateWeight();
 			printf("Initialized. Begin to work...\n");
-			
+			/*
+			#ifdef _DEBUG
+freopen("cpuout.txt","w", stdout);
+#endif // _DEBUG
+*/
 			nptr->TrainSet(imageList, trainnum, 0.001, iter, true, false, maxtime);
-
+			#ifdef _DEBUG
+freopen("CON","w", stdout);
+#endif // _DEBUG
 			if(testnum != 0)
 			{
 				nptr->TestSet(imageList, testnum);

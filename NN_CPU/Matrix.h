@@ -164,6 +164,9 @@ public:
 	//
 	CMatrix Sigmoid();
 
+	void Sigmoid1();
+	void SigmoidEx1();
+
 	/////////////////////////////////////////////////////////////////////////
 	// 对矩阵中所有的元素进行一次非线性变换:
 	//		变换后的值y与变换前的值的关系是:
@@ -320,6 +323,8 @@ public:
 
 	void Print();
 
+	void Print(const char* s);
+
 private:
 
 	int m_nRow;			// 矩阵所拥有的行数
@@ -362,4 +367,7 @@ private:
 
 };
 CMatrix operator - (double nValue, const CMatrix& cMatrixB);
+
+
+void Sgemm(float alpha, const CMatrix& A, const CMatrix& B, float beta, CMatrix& C);
 #endif // MATRIX_H_INCLUDED

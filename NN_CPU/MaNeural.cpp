@@ -29,35 +29,53 @@ void MaNeural::Init(int numSample)
 
 	this->numSample = numSample;
 
-	this->mInputValue.Resize(numInput, numSample);
+	this->mInputValue.Resize(numSample, numInput+1);
 
-	this->mI2HWeight.Resize(numHidden, numInput);
+	this->mI2HWeight.Resize(numInput+1, numHidden);
 
-
-	this->mH2OWeight.Resize(numOutput, numHidden);
-
-
-	this->mHideBias.Resize(numHidden, 1);
-
-
-	this->mOutputBias.Resize(numOutput, 1);
-
-	for (int i = 0;i<mHideBias.GetRowCount();i++)
-	{
-		mHideBias.m_pTMatrix(i,0) = 1.0f;
-	}
-
-	for (int i = 0;i<mOutputBias.GetRowCount();i++)
-	{
-		mOutputBias.m_pTMatrix(i,0) = 1.0f;
-	}
+	this->mHideOutput.Resize(numSample, numHidden);
+	this->mHideOutEx.Resize(numSample, numHidden + 1);
+	this->mH2OWeight.Resize(numHidden+1, numOutput);
+	this->mOutOutput.Resize(this->numSample, this->numOutput);
 
 }
 
 void MaNeural::GenerateWeight()
 {
-	this->mI2HWeight.RandomInitialize(HIGH, LOW);
-	this->mH2OWeight.RandomInitialize(HIGH, LOW);
+	FILE* fptr = fopen("w1.txt", "r");
+	FILE* fptr2 = fopen("w2.txt", "r");
+	if(fptr != NULL && fptr2 != NULL)
+	{
+		printf("Weight files exist, reading files...\n");
+		for(int i=0; i<numInput+1; i++)
+		{
+			for(int j=0;j<numHidden;j++)
+			{
+				float val;
+				fscanf(fptr, "%f", &val);
+				this->mI2HWeight.m_pTMatrix(i,j)= val;
+			}
+		}
+
+		for(int i=0;i<numHidden+1;i++)
+		{
+			for(int j=0;j<numOutput;j++)
+			{
+				float val;
+				fscanf(fptr2, "%f", &val);
+				this->mH2OWeight.m_pTMatrix(i,j) = val;
+			}
+		}
+		fclose(fptr);
+		fclose(fptr2);
+	}
+	else
+	{
+		printf("Files not found completely, generating...\n");
+		this->mI2HWeight.RandomInitialize(HIGH, LOW);
+		this->mH2OWeight.RandomInitialize(HIGH, LOW);
+	}
+	
 	
 }
 
@@ -84,16 +102,26 @@ void MaNeural::TrainSet(float* input, float* target, int count, float diff, int 
 void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bool deltaWeight, float maxtime)
 {
 	forwardCount = 0;
-
+	CMatrix W2(this->numHidden, this->numOutput);
 
 	CMatrix mOutputError(this->numOutput, this->numSample);
-	double t;
+	double t = 0;
 	TIMEV_START(t);
 
-
+	for(int i=0;i<numHidden;i++)
+	{
+		for(int j=0;j<numOutput;j++)
+		{
+			W2.m_pTMatrix(i,j) = this->mH2OWeight.m_pTMatrix(i,j);
+		}
+	}
+	
 	Forward(this->mI2HWeight, this->mHideBias, this->mH2OWeight, this->mOutputBias, VERBOSE);
+
+
 	mOutputError = mDemoOutput - this->mOutOutput;
 	float sysErrOld = mOutputError.GetSystemError();
+
 
 	this->s_mI2HWeight = this->mI2HWeight;
 	this->s_mH2OWeight = this->mH2OWeight;
@@ -119,108 +147,39 @@ void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bo
 			break;
 		}
 
-		// 求输出层的delta值
-		// 注意: 此处'/' 是 '点乘'!!!
-		CMatrix	mOutDelta (this->numOutput, this->numSample);
-		mOutDelta = (this->mOutOutput - this->mOutOutput  / this->mOutOutput ) / mOutputError;
-		//cMatrixOutputLayerDelta 是一个误差矩阵，行数为输出元数，列数为样本数
+		CMatrix delta2 = (this->mOutOutput - this->mOutOutput / this->mOutOutput) / mOutputError; //Sam*Out
 
-		CMatrix t_mH2OWeight (this->mH2OWeight.GetColCount() , this->mH2OWeight.GetRowCount());
-		t_mH2OWeight = this->mH2OWeight.Transpose();
-
-		// 求隐含层的delta值
-		// 注意: 此处'/' 是 '点乘'!!!
-		CMatrix mHideDelta;
-		mHideDelta.CopyMatrix ( (this->mHideOutput - (this->mHideOutput / this->mHideOutput)) / ( t_mH2OWeight * mOutDelta) );
+		//delta2.Print("err");
+		Sgemm(eta, this->mHideOutEx.Transpose(), delta2, 1.0f, this->mH2OWeight);
+		
+		
+		
+		CMatrix delta1(this->numSample, this->numHidden);
+		Sgemm(1.0f, delta2, W2.Transpose(), 0.0f, delta1);
 
 
 
-		// 定义新的输入层到隐含层的权值
-		CMatrix mNewI2HWeight (this->mI2HWeight.GetRowCount(), this->mI2HWeight.GetColCount());
+		CMatrix delta1_after = (this->mHideOutput - this->mHideOutput / this->mHideOutput) / delta1;
+		//this->mI2HWeight.Print("W1 before");
+		Sgemm(eta, this->mInputValue.Transpose(), delta1_after, 1.0f, this->mI2HWeight);
+		//this->mI2HWeight.Print("W1 after");
 
-		/*
-		// 定义的新的隐含层的阀值
-		CMatrix mNewHideBias (this->numHidden, this->numSample);
-		*/
-		// 定义新的隐含层到输出层的权值
-		CMatrix mNewH2OWeight (this->mH2OWeight.GetRowCount(), this->mH2OWeight.GetColCount());
-
-		/*
-		// 定义新的输出层的阀值
-		CMatrix mNewOutputBias (this->numOutput, this->numSample);
-		*/
-		// 定义新的误差矩阵
-		CMatrix cMatrixNewOutputLayerError(this->numOutput, this->numSample);
-
-
-		// 权值和阀值调整
-		mNewH2OWeight = mOutDelta * (this->mHideOutput.Transpose ()) * (this->eta);
-
-
-		//mNewOutputBias = mOutDelta * this->eta;//这里阀值的改变没有*nStep
-
-		mNewI2HWeight = mHideDelta * (this->mInputValue.Transpose ()) * (this->eta);
-
-
-
-		//mNewHideBias = mHideDelta * this->eta;
-
-		// 赋值
-		this->mI2HWeight += mNewI2HWeight;
-		if(deltaWeight)
+		for(int i=0;i<numHidden;i++)
 		{
-			if(d_mI2HWeight.GetColCount() == 0 || d_mI2HWeight.GetRowCount() == 0)
+			for(int j=0;j<numOutput;j++)
 			{
-				this->d_mI2HWeight = this->mI2HWeight;
-			}
-			else
-			{
-				this->mI2HWeight += this->d_mI2HWeight * alpha;
-			}
-			
-		}
-
-
-		this->mH2OWeight += mNewH2OWeight;
-		if(deltaWeight)
-		{
-			if(d_mH2OWeight.GetColCount() == 0 || d_mH2OWeight.GetRowCount() == 0)
-			{
-				this->d_mH2OWeight = this->mH2OWeight;
-			}
-			else
-			{
-				this->mH2OWeight += this->d_mH2OWeight * alpha;
+				W2.m_pTMatrix(i,j) = this->mH2OWeight.m_pTMatrix(i,j);
 			}
 		}
 
-
-		/*
-		CMatrix tempHideBias(this->numHidden, 1);
-		mNewHideBias.CopySubMatrix(tempHideBias, 0, mNewHideBias.GetColCount() - 1);
-		tempHideBias += this->mHideBias;
-
-		CMatrix tempOutputBias(this->numOutput, 1);
-		mNewOutputBias.CopySubMatrix(tempOutputBias, 0, mNewOutputBias.GetColCount() - 1);
-		tempOutputBias += this->mOutputBias;
-		*/
-
-
-
-
-		//save delta weight
-		if(deltaWeight)
-		{
-			this->d_mH2OWeight = mNewH2OWeight;
-			this->d_mI2HWeight = mNewI2HWeight;
-		}
-
+		
 
 		// 前向计算
 		Forward(this->mI2HWeight, this->mHideBias, this->mH2OWeight, this->mOutputBias, VERBOSE);
 
 
-		mOutputError = mDemoOutput - this->mOutOutput;;
+		mOutputError = mDemoOutput - this->mOutOutput;
+
 		sysErrNew =	mOutputError.GetSystemError ();
 
 		alpha = this->alpha;
@@ -231,8 +190,8 @@ void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bo
 		{
 			//printf("Save\n");
 			//save
-			this->s_mI2HWeight = this->mI2HWeight;
-			this->s_mH2OWeight = this->mH2OWeight;
+			//this->s_mI2HWeight = this->mI2HWeight;
+			//this->s_mH2OWeight = this->mH2OWeight;
 
 			sysErrOld = sysErrNew;
 			if(changeEta)
@@ -248,14 +207,15 @@ void MaNeural::__TrainSet(int count, float diff, int maxIter, bool changeEta, bo
 			//restore
 			restore = true;
 			//printf("Restore\n");
-			this->mI2HWeight = this->s_mI2HWeight;
-			this->mH2OWeight = this->s_mH2OWeight;
+			//this->mI2HWeight = this->s_mI2HWeight;
+			//this->mH2OWeight = this->s_mH2OWeight;
 			//alpha = 0;
-			
+			/*
 			CMatrix tempError(this->numOutput, this->numSample);
 			Forward(this->mI2HWeight, this->mHideBias, this->mH2OWeight, this->mOutputBias, VERBOSE);
 			mOutputError = mDemoOutput - this->mOutOutput;
 			float sysErrSpe = mOutputError.GetSystemError();
+			*/
 			//printf("Special err = %.6f\n", sysErrSpe);
 
 			if (changeEta)
@@ -311,21 +271,22 @@ void MaNeural::TrainSet(Image* imageList, int count, float diff, int maxIter, bo
 		int length = imageList[i].length;
 		for(int j=0;j<length;j++)
 		{
-			this->mInputValue.m_pTMatrix (j, i) = imageList[i].content[j] / 16;
+			this->mInputValue.m_pTMatrix (i,j) = imageList[i].content[j] / 16;
 			
 		}
+		this->mInputValue.m_pTMatrix(i, length) = 1.0f;
 		
 
 	}
 	//cout << "First mInputValue" << endl;
 	//this->mInputValue.Print();
-	this->mDemoOutput.Resize(this->numOutput, this->numSample);
+	this->mDemoOutput.Resize(this->numSample, this->numOutput);
 	for(int i=0;i < count;i++)
 	{
 		float* target = tarptr->GetTarget(imageList[i].label);
 		for(int j = 0;j<this->numOutput;j++)
 		{
-			mDemoOutput.m_pTMatrix (j, i) = target[j];
+			mDemoOutput.m_pTMatrix (i, j) = target[j];
 		}
 	}
 
@@ -356,81 +317,25 @@ void MaNeural::PrintTest(float* input)
 void MaNeural::Forward(CMatrix& _mI2HWeight, CMatrix& _mHideBias, CMatrix& _mH2OWeight, CMatrix& _mOutputBias, bool verbose)
 {
 	forwardCount++;
-	//printf("Forward ...\n");
-	CMatrix cMExHideBias;
-	cMExHideBias.nncpyi(_mHideBias, this->numSample);
-	//cout << "_mHideBias" << endl;
-	//_mHideBias.Print();
-	//cout << "cMExHideBias" << endl;
-	//cMExHideBias.Print();
 
 
 	CMatrix cMHidePureInput(this->numHidden, this->numSample);
-	
-	if(verbose)
-	{
-		cout << "mI2HWeight" << endl;
-		_mI2HWeight.Print();
-		cout << "mInputValue" << endl;
-		this->mInputValue.Print();
-	}
 
 	
-	cMHidePureInput = _mI2HWeight * this->mInputValue;
-	//cout << "cMHidePureInput" << endl;
-	//cMHidePureInput.Print();
-
-
-	cMHidePureInput += cMExHideBias;
-
-
-	//cout << "cMHidePureInput" << endl;
-	//cMHidePureInput.Print();
-	//CMatrix cMHideOutput(this->numHidden, this->numSample);
-
-	this->mHideOutput = cMHidePureInput.Sigmoid();
-	if (verbose)
-	{
-		cout << "_mH20Weight" << endl;
-		_mH2OWeight.Print();
-		cout << "mHideOutput" << endl;
-		this->mHideOutput.Print();
-	}
+	Sgemm(1.0f, this->mInputValue, this->mI2HWeight, 0.0f, this->mHideOutput);
+	/*
+	this->mInputValue.Print();
+	this->mI2HWeight.Print();
 	
-
-	CMatrix cMExOutputBias;
-	//cout << "OutputBias" << endl;
-	//_mOutputBias.Print();
-	cMExOutputBias.nncpyi(_mOutputBias, this->numSample);
-	//cout << "cMExOutputBias" << endl;
-	//cMExOutputBias.Print();
-
-	CMatrix cMOutPureInput(this->numOutput, this->numSample);
+	this->mHideOutput.Print();
+	*/
+	this->mHideOutput.CopyTo(this->mHideOutEx, 0, 0);
+	this->mHideOutput.Sigmoid1();
+	this->mHideOutEx.SigmoidEx1();
 	
-	//cout << "mHideOutput" << endl;
-	//this->mHideOutput.Print();
-	if(verbose)
-	{
-		
-	}
+	Sgemm(1.0f, this->mHideOutEx, this->mH2OWeight, 0.0f, this->mOutOutput);
 	
-
-	cMOutPureInput = _mH2OWeight * this->mHideOutput;
-	//cout << "cMOutPureInput" << endl;
-	//cMOutPureInput.Print();
-
-	cMOutPureInput += cMExOutputBias;
-
-
-	//cout << "cMOutPureInput" << endl;
-	//cMOutPureInput.Print();
-	this->mOutOutput = cMOutPureInput.Sigmoid();
-
-	if (verbose)
-	{
-		cout << "mOutOutput" << endl;
-		this->mOutOutput.Print();
-	}
+	this->mOutOutput.Sigmoid1();
 	
 }
 
@@ -438,18 +343,20 @@ void MaNeural::Forward(CMatrix& _mI2HWeight, CMatrix& _mHideBias, CMatrix& _mH2O
 bool MaNeural::Test(float* input, int label)
 {
 	this->numSample = 1;
-	this->mInputValue.Resize(this->numInput, 1);
+	this->mInputValue.Resize( numSample, this->numInput+1);
 
 	for(int i=0;i<this->numInput;i++)
 	{
-		this->mInputValue.m_pTMatrix(i, 0) = input[i];
+		this->mInputValue.m_pTMatrix(0, i) = input[i];
 	}
+
+	this->mInputValue.m_pTMatrix(0, this->numInput) = 1.0f;
 	Forward(this->mI2HWeight, this->mHideBias, this->mH2OWeight, this->mOutputBias);
 
 	float* output = new float[this->numOutput];
 	for(int i=0;i<this->numOutput;i++)
 	{
-		output[i] = this->mOutOutput.m_pTMatrix(i, 0);
+		output[i] = this->mOutOutput.m_pTMatrix(0, i);
 	}
 
 	int predict = tarptr->Check(output);
