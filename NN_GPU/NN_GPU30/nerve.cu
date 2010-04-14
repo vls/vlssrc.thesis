@@ -59,6 +59,13 @@
 // Program main
 ////////////////////////////////////////////////////////////////////////////////
 const int OUTPUT_NUM = 4;
+
+const int TARGET_NUM = 10;
+float target[TARGET_NUM][OUTPUT_NUM];
+
+const float HIGH = 1.0f;
+const float LOW = 0.0f;
+
 int
 run(int argc, char** argv)
 {	
@@ -105,7 +112,7 @@ run(int argc, char** argv)
 		printf("Can't init sample\n");
 		return 0;
 	}
-	train(lr, MaxEpochs, HiddenUnitNum, InDim, OutDim, SamNum, h_SamInEx, h_SamOut, h_W1Ex, h_W2Ex, false);
+	train(lr, MaxEpochs, HiddenUnitNum, InDim, OutDim, SamNum, h_SamInEx, h_SamOut, h_W1Ex, h_W2Ex, false, 0.0f);
 	/*
 	printf("\n");
 	for(int i=0; i<size_W1Ex; i++)
@@ -146,9 +153,9 @@ run(int argc, char** argv)
 }
 
 
-int runImage(int argc, char** argv, Image* imageList, int count, int maxIter, bool changeEta)
+int runImage(int argc, char** argv, Image* imageList, int trainnum, int testnum, int maxIter, bool changeEta, float maxtime)
 {
-	if(imageList == NULL || count == 0)
+	if(imageList == NULL || trainnum == 0)
 	{
 		return -1;
 	}
@@ -158,10 +165,10 @@ int runImage(int argc, char** argv, Image* imageList, int count, int maxIter, bo
 	const int HiddenUnitNum = 16;
 	const int InDim = imageList[0].length;
 	const int OutDim = OUTPUT_NUM;
-	const int SamNum = count;
+	int SamNum = trainnum;
 
-	const int size_SamInEx = ((int)(SamNum*(InDim+1)));
-	const int size_SamOut =  ((int)(SamNum*OutDim));
+	int size_SamInEx = ((int)(SamNum*(InDim+1)));
+	int size_SamOut =  ((int)(SamNum*OutDim));
 	const int size_W1Ex	 = ((int)(HiddenUnitNum*(InDim+1)));
 	const int size_W2Ex	 = ((int)(OutDim*(HiddenUnitNum+1)));
 
@@ -180,9 +187,32 @@ int runImage(int argc, char** argv, Image* imageList, int count, int maxIter, bo
 		printf("Can't init image into input\n");
 		return 0;
 	}
-	train(lr, MaxEpochs, HiddenUnitNum, InDim, OutDim, SamNum, h_SamInEx, h_SamOut, h_W1Ex, h_W2Ex, changeEta);
+	train(lr, MaxEpochs, HiddenUnitNum, InDim, OutDim, SamNum, h_SamInEx, h_SamOut, h_W1Ex, h_W2Ex, changeEta, maxtime);
 
+	if(testnum != 0)
+	{
+		if(testnum != trainnum)
+		{
+			SamNum = testnum;
+			size_SamInEx = ((int)(SamNum*(InDim+1)));
+			size_SamOut =  ((int)(SamNum*OutDim));
+			CUDA_SAFE_CALL( cudaFreeHost((h_SamOut)));
+			CUDA_SAFE_CALL( cudaFreeHost((h_SamInEx)));
+			CUDA_SAFE_CALL( cudaMallocHost((void**) &h_SamInEx, sizeof(float)*size_SamInEx));
+			CUDA_SAFE_CALL( cudaMallocHost((void**) &h_SamOut, sizeof(float)*size_SamOut));
+		}
+		
 
+		for(int i=0; i<SamNum; i++)
+		{	
+			for(int j=0; j<InDim;j++)
+			{
+				h_SamInEx[IDX2C(i,j,SamNum)] = imageList[i].content[j] / 16;
+			}
+		}
+		Test(h_SamInEx, InDim, HiddenUnitNum, OutDim, SamNum, h_W1Ex, h_W2Ex, imageList);
+	}
+	
 
 	CUDA_SAFE_CALL( cudaFreeHost((h_SamInEx)));
 	CUDA_SAFE_CALL( cudaFreeHost((h_SamOut)));
@@ -209,9 +239,9 @@ bool InitImage(int SamNum, int InDim, int OutDim, int HiddenUnitNum, float* h_Sa
 {
 	const int size_SamInEx = ((int)(SamNum*(InDim+1)));
 	const int size_SamOut =  ((int)(SamNum*OutDim));
-	const int size_W1Ex	 = ((int)(HiddenUnitNum*(InDim+1)));
-	const int size_W2Ex	 = ((int)(OutDim*(HiddenUnitNum+1)));
-	const int TARGET_NUM = 10;
+	const int size_W1Ex	 = ((int)((InDim+1)*HiddenUnitNum));
+	const int size_W2Ex	 = ((int)((HiddenUnitNum+1)*OutDim));
+	
 
 
 	for(int i=0; i<size_SamInEx; i++)
@@ -240,7 +270,7 @@ bool InitImage(int SamNum, int InDim, int OutDim, int HiddenUnitNum, float* h_Sa
 	#endif // _DEBUG
 	*/
 
-	float target[TARGET_NUM][OUTPUT_NUM];
+	
 	for(int i=0;i<TARGET_NUM;i++)
 	{
 		int fi = i;
@@ -248,7 +278,7 @@ bool InitImage(int SamNum, int InDim, int OutDim, int HiddenUnitNum, float* h_Sa
 		memset(target[i], 0, sizeof(float) * OUTPUT_NUM);
 		while(fi)
 		{
-			target[i][j--] =(float)( fi & 1 ? 1 : 0);
+			target[i][j--] =(float)( fi & 1 ? HIGH : LOW);
 			fi >>= 1;
 		}
 	}
@@ -259,7 +289,9 @@ bool InitImage(int SamNum, int InDim, int OutDim, int HiddenUnitNum, float* h_Sa
 		{
 
 			h_SamOut[IDX2C(i,j,SamNum)] = target[imageList[i].label][j];
+			//printf("%.2f\t", h_SamOut[IDX2C(i,j,SamNum)]);
 		}
+		//printf("\n");
 	}
 	/*
 	#ifdef _DEBUG
@@ -275,17 +307,77 @@ bool InitImage(int SamNum, int InDim, int OutDim, int HiddenUnitNum, float* h_Sa
 	}
 	#endif // _DEBUG
 	*/
+	
 
-	srand(time(NULL));
-	for(int i=0; i<size_W1Ex; i++)
+	FILE* fptr = fopen("w1.txt", "r");
+	FILE* fptr2 = fopen("w2.txt", "r");
+	if(fptr != NULL && fptr2 != NULL)
 	{
-		h_W1Ex[i]=0.2f*rand()/(float)RAND_MAX - 0.1f;
-	}
-	for(int i=0; i<size_W2Ex; i++)
-	{
-		h_W2Ex[i]=0.2f*rand()/(float)RAND_MAX - 0.1f;
-	}
+		printf("Weight files exist, reading files...\n");
+		for(int i=0; i<InDim+1; i++)
+		{
+			for(int j=0;j<HiddenUnitNum;j++)
+			{
+				fscanf(fptr, "%f", &h_W1Ex[IDX2C(i,j,InDim+1)]);
+			}
 
+		}
+		
+
+		for(int i=0; i<HiddenUnitNum+1; i++)
+		{
+			for(int j=0;j<OutDim;j++)
+			{
+				fscanf(fptr2, "%f", &h_W2Ex[IDX2C(i,j,HiddenUnitNum+1)]);
+				
+			}
+
+		}
+
+		fclose(fptr);
+		fclose(fptr2);
+	}
+	else
+	{
+		printf("Files not found completely, generating...\n");
+		for(int i=0; i<size_W1Ex; i++)
+		{
+			h_W1Ex[i]=0.2f*rand()/(float)RAND_MAX - 0.1f;
+		}
+		for(int i=0; i<size_W2Ex; i++)
+		{
+			h_W2Ex[i]=0.2f*rand()/(float)RAND_MAX - 0.1f;
+		}
+
+		freopen("w1.txt", "w", stdout);
+		for(int i=0; i<InDim+1; i++)
+		{
+			for(int j=0;j<HiddenUnitNum;j++)
+			{
+				printf("%f\t",h_W1Ex[IDX2C(i,j,InDim+1)]);
+			}
+
+		}
+
+		freopen("w2.txt", "w", stdout);
+		for(int i=0; i<HiddenUnitNum+1; i++)
+		{
+			for(int j=0;j<OutDim;j++)
+			{
+				printf("%f\t", h_W2Ex[IDX2C(i,j,HiddenUnitNum)]);
+			}
+
+		}
+
+		freopen("CON", "w",stdout);
+	}
+	
+
+	//srand(time(NULL));
+	
+	
+	
+	
 	return true;
 }
 
@@ -396,7 +488,7 @@ bool InitSample(int SamNum, int InDim, int OutDim, int HiddenUnitNum, float* h_S
 
 
 void
-train(float lr, int MaxEpochs, int HiddenUnitNum, int InDim,int OutDim,int SamNum, float* h_SamInEx, float* h_SamOut, float* h_W1Ex, float* h_W2Ex, bool changeEta)
+train(float lr, int MaxEpochs, int HiddenUnitNum, int InDim,int OutDim,int SamNum, float* h_SamInEx, float* h_SamOut, float* h_W1Ex, float* h_W2Ex, bool changeEta, float maxtime)
 {
 	const int size_SamInEx = ((int)(SamNum*(InDim+1)));
 	const int size_SamOut =  ((int)(SamNum*OutDim));
@@ -408,7 +500,6 @@ train(float lr, int MaxEpochs, int HiddenUnitNum, int InDim,int OutDim,int SamNu
 	float* d_W2;
 	float* d_SamInEx;
 	float* d_SamOut;
-	float* d_error;
 	float* HiddenOutEx;
 	float* NetworkOut;
 	float* Delta1;
@@ -423,7 +514,16 @@ train(float lr, int MaxEpochs, int HiddenUnitNum, int InDim,int OutDim,int SamNu
 	unsigned int copyTimer = 0;
 	unsigned int postCopyTimer = 0;
 
-
+/*
+	for(int i=0;i<SamNum;i++)
+	{
+		for(int j=0;j<InDim+1;j++)
+		{
+			printf("%.4f\t", h_SamInEx[IDX2C(i,j,SamNum)]);
+		}
+		printf("\n");
+	}
+*/
 	dim3 threads(BLOCK_SIZE, BLOCK_SIZE);
 	dim3 HiddenOutExgrid(iDivUp(SamNum, BLOCK_SIZE), iDivUp((HiddenUnitNum+1), BLOCK_SIZE));
 	dim3 HiddenOutgrid(iDivUp(SamNum, BLOCK_SIZE), iDivUp((HiddenUnitNum), BLOCK_SIZE));
@@ -435,7 +535,8 @@ train(float lr, int MaxEpochs, int HiddenUnitNum, int InDim,int OutDim,int SamNu
 	h_HiddenOutEx = (float*) malloc(sizeof(float)*(HiddenUnitNum+1)*SamNum);
 	CUT_SAFE_CALL( cutCreateTimer( &copyTimer));
 	CUT_SAFE_CALL( cutStartTimer( copyTimer));
-	CUDA_SAFE_CALL(cudaMalloc((void**) &d_error, sizeof(float)*size_SamOut));
+	
+
 	CUDA_SAFE_CALL(cudaMalloc((void**) &d_W1Ex, sizeof(float)*size_W1Ex));
 	CUDA_SAFE_CALL(cudaMalloc((void**) &d_W2Ex, sizeof(float)*size_W2Ex));
 	CUDA_SAFE_CALL(cudaMalloc((void**) &d_W2, sizeof(float)*OutDim*HiddenUnitNum));
@@ -450,12 +551,12 @@ train(float lr, int MaxEpochs, int HiddenUnitNum, int InDim,int OutDim,int SamNu
 	CUDA_SAFE_CALL(cudaMemcpy(d_SamInEx, h_SamInEx, sizeof(float)*size_SamInEx,cudaMemcpyHostToDevice));
 	CUDA_SAFE_CALL(cudaMemcpy(d_SamOut, h_SamOut, sizeof(float)*size_SamOut,cudaMemcpyHostToDevice));
 	
-
+	
 	CUT_SAFE_CALL( cutStopTimer( copyTimer));
 	preCopyTime = cutGetTimerValue( copyTimer);
 	printf( "Pre-copy time: %f (ms)\n", cutGetTimerValue( copyTimer));
 	CUT_SAFE_CALL( cutDeleteTimer( copyTimer));
-
+	
 	CUT_SAFE_CALL( cutCreateTimer( &timer));
 	CUT_SAFE_CALL( cutStartTimer( timer));
 	float errOld;
@@ -469,27 +570,41 @@ train(float lr, int MaxEpochs, int HiddenUnitNum, int InDim,int OutDim,int SamNu
 		//注意这里是column-majoring
 	}
 	cublasSgemm('n','n',SamNum, HiddenUnitNum, (InDim+1), 1.0f,  d_SamInEx, SamNum, d_W1Ex, (InDim+1), 0.0f, HiddenOutEx, SamNum );
+	
+
+	
 
 	logsig1<<<HiddenOutExgrid, threads>>>(HiddenOutEx, SamNum, HiddenUnitNum);
+
 	//logsig1后边界的阈值设为1
 	cublasSgemm('n','n',SamNum, OutDim, (HiddenUnitNum+1), 1.0f,  HiddenOutEx, SamNum, d_W2Ex, (HiddenUnitNum+1), 0.0f, NetworkOut, SamNum );
 	logsig2<<<SamOutgrid,threads>>>(NetworkOut, SamNum, OutDim);
 	//logsig2不设边界阈值
+	
+	
+	
+	
+
 	dotsub<<<SamOutgrid,threads>>>(Delta2, d_SamOut, NetworkOut, SamNum, OutDim);
 	//#ifdef VERBOSE
 	errOld = GPUPowSum(Delta2, OutDim* SamNum);
-
 	for(int l=0; l< MaxEpochs; l++)
 	{
 
 
 
 		getdelta<<<SamOutgrid,threads>>>(Delta2, NetworkOut, SamNum, OutDim);
+		
 		cublasSgemm('t','n',(HiddenUnitNum+1), OutDim, SamNum, lr,  HiddenOutEx, SamNum, Delta2, SamNum, 1.0f, d_W2Ex, (HiddenUnitNum+1) );
+
 		//实质上将W变化量加起来了
 		cublasSgemm('n','t', SamNum, HiddenUnitNum, OutDim, 1.0f,  Delta2, SamNum, d_W2, HiddenUnitNum, 0.0f, Delta1, SamNum );
+		
 		getdelta<<<HiddenOutgrid, threads>>>(Delta1, HiddenOutEx, SamNum, HiddenUnitNum);
+		
+		
 		cublasSgemm('t','n', (InDim+1), HiddenUnitNum, SamNum, lr, d_SamInEx, SamNum, Delta1, SamNum, 1.0f, d_W1Ex, (InDim+1));
+		
 
 		forwardCount++;
 		for(int i=0; i< OutDim; i++)
@@ -500,11 +615,11 @@ train(float lr, int MaxEpochs, int HiddenUnitNum, int InDim,int OutDim,int SamNu
 
 		cublasSgemm('n','n',SamNum, HiddenUnitNum, (InDim+1), 1.0f,  d_SamInEx, SamNum, d_W1Ex, (InDim+1), 0.0f, HiddenOutEx, SamNum );
 		//SamNum*(InDim+1) * (InDim+1)*HiddenUnitNUm
-		/*
+		
 		#ifdef _DEBUG
 		CUDA_SAFE_CALL(cudaMemcpy(h_HiddenOutEx, HiddenOutEx, sizeof(float)*(HiddenUnitNum+1)*SamNum, cudaMemcpyDeviceToHost));
 		#endif // _DEBUG
-		*/
+		
 
 		logsig1<<<HiddenOutExgrid, threads>>>(HiddenOutEx, SamNum, HiddenUnitNum);
 		//logsig1后边界的阈值设为1
@@ -514,8 +629,10 @@ train(float lr, int MaxEpochs, int HiddenUnitNum, int InDim,int OutDim,int SamNu
 		dotsub<<<SamOutgrid,threads>>>(Delta2, d_SamOut, NetworkOut, SamNum, OutDim);
 
 		errNew = GPUPowSum(Delta2, OutDim* SamNum);
-
-
+	
+		#ifdef _DEBUG
+			printf("Iter = %d, New = %.6f, Old = %.6f, Eta = %.3f\n", l, errNew, errOld, lr);
+		#endif // _DEBUG
 		if(errNew < errOld)
 		{
 			errOld = errNew;
@@ -533,7 +650,20 @@ train(float lr, int MaxEpochs, int HiddenUnitNum, int InDim,int OutDim,int SamNu
 				lr = newEta > 0.01 ? newEta : lr;
 			}
 		}
-		//printf("Iter = %d, New = %.6f, Old = %.6f, Eta = %.3f\n", l, errNew, errOld, lr);
+	
+		if(maxtime != 0)
+		{
+			cutStopTimer(timer);
+			float nowtime =  cutGetTimerValue( timer);
+			cutStartTimer(timer);
+			if(nowtime > maxtime)
+			{
+				
+				break;
+			}
+		}
+
+		
 
 	}
 	CUT_SAFE_CALL( cutStopTimer( timer));
@@ -556,7 +686,7 @@ train(float lr, int MaxEpochs, int HiddenUnitNum, int InDim,int OutDim,int SamNu
 
 	printf("Copy time percent = %.4f %%\n", (preCopyTime + postCopyTime) * 100 / (preCopyTime + postCopyTime + runTime) );
 
-	/*	
+	
 	#ifdef _DEBUG
 	for(int i=0;i<SamNum;i++)
 	{
@@ -567,12 +697,13 @@ train(float lr, int MaxEpochs, int HiddenUnitNum, int InDim,int OutDim,int SamNu
 	printf("\n");
 	}
 	#endif // _DEBUG
-	*/
+	
 
 	CUDA_SAFE_CALL(cudaFree(d_SamInEx));
 	CUDA_SAFE_CALL(cudaFree(d_SamOut));
 	CUDA_SAFE_CALL(cudaFree(d_W1Ex));
 	CUDA_SAFE_CALL(cudaFree(d_W2Ex));
+	CUDA_SAFE_CALL(cudaFree(d_W2));
 
 	CUDA_SAFE_CALL(cudaFree(HiddenOutEx));
 	CUDA_SAFE_CALL(cudaFree(NetworkOut));
@@ -580,6 +711,145 @@ train(float lr, int MaxEpochs, int HiddenUnitNum, int InDim,int OutDim,int SamNu
 	CUDA_SAFE_CALL(cudaFree(Delta2));
 
 	free(h_HiddenOutEx);
+}
+
+float Test(float* h_SamInEx, int InDim, int HiddenUnitNum, int OutDim ,int SamNum, float* h_W1Ex, float* h_W2Ex, Image* imageList)
+{
+	printf("Begin to test...\n");
+	const int size_SamInEx = ((int)(SamNum*(InDim+1)));
+	const int size_SamOut =  ((int)(SamNum*OutDim));
+	const int size_W1Ex	 = ((int)(HiddenUnitNum*(InDim+1)));
+	const int size_W2Ex	 = ((int)(OutDim*(HiddenUnitNum+1)));
+
+	float* d_W1Ex;
+	float* d_W2Ex;
+	float* d_W2;
+	float* d_SamInEx;
+	float* HiddenOutEx;
+	float* NetworkOut;
+
+
+	CUDA_SAFE_CALL(cudaMalloc((void**) &d_W1Ex, sizeof(float)*size_W1Ex));
+	CUDA_SAFE_CALL(cudaMalloc((void**) &d_W2Ex, sizeof(float)*size_W2Ex));
+	CUDA_SAFE_CALL(cudaMalloc((void**) &d_W2, sizeof(float)*OutDim*HiddenUnitNum));
+	CUDA_SAFE_CALL(cudaMalloc((void**) &d_SamInEx, sizeof(float)*size_SamInEx));
+	CUDA_SAFE_CALL(cudaMalloc((void**) &HiddenOutEx, sizeof(float)*(HiddenUnitNum+1)*SamNum));
+	CUDA_SAFE_CALL(cudaMalloc((void**) &NetworkOut, sizeof(float)*size_SamOut));
+
+	CUDA_SAFE_CALL(cudaMemcpy(d_W1Ex, h_W1Ex, sizeof(float)*size_W1Ex,cudaMemcpyHostToDevice));
+	CUDA_SAFE_CALL(cudaMemcpy(d_W2Ex, h_W2Ex, sizeof(float)*size_W2Ex,cudaMemcpyHostToDevice));
+	CUDA_SAFE_CALL(cudaMemcpy(d_SamInEx, h_SamInEx, sizeof(float)*size_SamInEx,cudaMemcpyHostToDevice));
+
+	dim3 threads(BLOCK_SIZE, BLOCK_SIZE);
+	dim3 HiddenOutExgrid(iDivUp(SamNum, BLOCK_SIZE), iDivUp((HiddenUnitNum+1), BLOCK_SIZE));
+	dim3 HiddenOutgrid(iDivUp(SamNum, BLOCK_SIZE), iDivUp((HiddenUnitNum), BLOCK_SIZE));
+	dim3 SamOutgrid(iDivUp(SamNum, BLOCK_SIZE), iDivUp(OutDim, BLOCK_SIZE));
+
+	dim3 OutErrGrid(iDivUp(OutDim, BLOCK_SIZE), iDivUp(OutDim, BLOCK_SIZE));
+
+/*
+	for(int i=0;i<SamNum;i++)
+	{
+		for(int j=0;j<InDim+1;j++)
+		{
+			printf("%.4f\t", h_SamInEx[IDX2C(i,j,SamNum)]);
+		}
+		printf("\n");
+	}
+*/
+
+	float errOld;
+	for(int i=0; i< OutDim; i++)
+	{
+		CUDA_SAFE_CALL(cudaMemcpy(d_W2 + HiddenUnitNum * i, d_W2Ex + (HiddenUnitNum + 1) * i, sizeof(float)*HiddenUnitNum,cudaMemcpyDeviceToDevice));
+		//注意这里是column-majoring
+	}
+	cublasSgemm('n','n',SamNum, HiddenUnitNum, (InDim+1), 1.0f,  d_SamInEx, SamNum, d_W1Ex, (InDim+1), 0.0f, HiddenOutEx, SamNum );
+
+	logsig1<<<HiddenOutExgrid, threads>>>(HiddenOutEx, SamNum, HiddenUnitNum);
+	//logsig1后边界的阈值设为1
+	cublasSgemm('n','n',SamNum, OutDim, (HiddenUnitNum+1), 1.0f,  HiddenOutEx, SamNum, d_W2Ex, (HiddenUnitNum+1), 0.0f, NetworkOut, SamNum );
+	logsig2<<<SamOutgrid,threads>>>(NetworkOut, SamNum, OutDim);
+
+
+
+	float* h_Out;
+	h_Out = (float*) malloc(sizeof(float) * size_SamOut);
+	CUDA_SAFE_CALL(cudaMemcpy(h_Out, NetworkOut, sizeof(float)*size_SamOut, cudaMemcpyDeviceToHost));
+
+	int rightCount = 0;
+
+	float door = (HIGH - LOW) * 0.7 + LOW;
+	for(int i=0;i<SamNum;i++)
+	{
+		int predict = 0;
+		for(int j=0;j<OutDim;j++)
+		{
+			predict <<= 1;
+			float tar = h_Out[IDX2C(i,j, SamNum)];
+			if(tar > door)
+			{
+				predict |= 1;
+			}
+			
+			printf("%.3f\t", tar);
+		}
+		printf("\n");
+		printf("%d -> %d\n", imageList[i].label, predict );
+		if(imageList[i].label == predict)
+		{
+			rightCount++;
+		}
+	}
+
+	printf("Percent = %.2f %%\n", (float)rightCount * 100 / SamNum);
+	
+	free(h_Out);
+
+	//logsig2不设边界阈值
+
+	CUDA_SAFE_CALL(cudaFree(d_SamInEx));
+	CUDA_SAFE_CALL(cudaFree(d_W1Ex));
+	CUDA_SAFE_CALL(cudaFree(d_W2Ex));
+	CUDA_SAFE_CALL(cudaFree(d_W2));
+
+	CUDA_SAFE_CALL(cudaFree(HiddenOutEx));
+	CUDA_SAFE_CALL(cudaFree(NetworkOut));
+
+}
+
+void Print(float* arr, int row, int col, const char* str)
+{
+	float* h_arr;
+
+	h_arr = (float*) malloc(sizeof(float) * row * col);
+
+	if(h_arr == NULL)
+	{
+		return;
+	}
+
+	CUDA_SAFE_CALL(cudaMemcpy(h_arr, arr, row*col*sizeof(float), cudaMemcpyDeviceToHost));
+
+	PrintHost(h_arr, row, col, str);
+	free(h_arr);
+}
+
+void PrintHost(float* arr, int row, int col, const char* str)
+{
+	if(str != NULL)
+	{
+		printf("%s\n", str);
+	}
+
+	for(int i=0;i<row;i++)
+	{
+		for(int j=0;j<col;j++)
+		{
+			printf("%f\t", arr[IDX2C(i,j,row)]);
+		}
+		printf("\n");
+	}
 }
 
 

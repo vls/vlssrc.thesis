@@ -22,20 +22,29 @@ main( int argc,char** argv)
 	{
 		return 0;
 	}
+
+
+
 	int iter = 1000;
 	int trainnum = 20;
 	bool isProfiler = false;
 	int intProfiler = 0;
+	int testnum = 0;
+	float maxtime = 0.0f;
 	cutGetCmdLineArgumenti(argc, (const char**) argv, "train", &trainnum);
 	cutGetCmdLineArgumenti(argc, (const char**) argv, "iter", &iter);
 	cutGetCmdLineArgumenti(argc, (const char**) argv, "profiler", &intProfiler);
-	if(!intProfiler)
+	cutGetCmdLineArgumenti(argc, (const char**) argv, "test", &testnum);
+	cutGetCmdLineArgumentf(argc, (const char**) argv, "maxtime", &maxtime);
+	printf("%d\n", intProfiler);
+	if(intProfiler)
 	{
 		isProfiler = true;
 	}
-
+	if(testnum == 0) testnum = trainnum /2;
 	printf("Iter = %d\n", iter);
 	printf("TrainNum = %d\n", trainnum);
+	printf("TestNum = %d\n", testnum);
 
 	CUT_DEVICE_INIT(argc, argv);
 
@@ -50,28 +59,33 @@ main( int argc,char** argv)
 	}
 
 
-	Image* imageList = new Image[trainnum];
-	read64("my_optdigits.tra", imageList, trainnum);
+	Image* imageList = new Image[trainnum+testnum];
+	read64("my_optdigits.tra", imageList, trainnum + testnum);
 
 	const int warmUpTime = 3;
 	if(!isProfiler)
 	{
+		freopen("verbose.txt", "w", stdout);
 		for(int i=0;i< warmUpTime;i++)
 		{
-			runImage(argc, argv, imageList, trainnum < warmUpTime ? trainnum : warmUpTime, 10, true);
+			runImage(argc, argv, imageList, trainnum < warmUpTime ? trainnum : warmUpTime, 0, 10, false, 0.0f);
 		}
-		printf("warmUp complete.\n\n\n");
+		freopen("CON", "w", stdout);
+		printf("Warm-up complete.\n\n\n");
 	}
-	
-	runImage(argc, argv, imageList, trainnum, iter, true);
+#ifdef _DEBUG
+	freopen("out.txt", "w", stdout);
+#endif // _DEBUG
+	runImage(argc, argv, imageList, trainnum, testnum, iter, true, maxtime);
+	freopen("CON", "w", stdout);
 	delete[] imageList;
 	//TestReduce();
+	
 	cublasShutdown();
 	if(!isProfiler)
 	{
 		CUT_EXIT(argc, argv);
 	}
-	
 	//getchar();
 	return 0;
 }
