@@ -820,7 +820,7 @@ void CMatrix::InitializeZero()
 
 void CMatrix::RandomInitialize(float high, float low)
 {
-	srand(time(NULL));
+	
 	for(int i=0; i < m_nRow; i++)
 	{
 		for(int j=0; j < m_nCol; j++)

@@ -1,6 +1,7 @@
 #include "MaNeural.h"
 
 #include <iostream>
+#include <time.h>
 const int _NUMLAYER = 3;
 #define VERBOSE false
 using namespace std;
@@ -71,6 +72,7 @@ void MaNeural::GenerateWeight()
 	}
 	else
 	{
+		srand(time(NULL));
 		printf("Files not found completely, generating...\n");
 		this->mI2HWeight.RandomInitialize(HIGH, LOW);
 		this->mH2OWeight.RandomInitialize(HIGH, LOW);

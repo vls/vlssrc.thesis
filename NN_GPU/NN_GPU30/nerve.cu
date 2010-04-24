@@ -202,15 +202,15 @@ int runImage(int argc, char** argv, Image* imageList, int trainnum, int testnum,
 			CUDA_SAFE_CALL( cudaMallocHost((void**) &h_SamOut, sizeof(float)*size_SamOut));
 		}
 		
-
+		Image* testEntrance = imageList+trainnum;
 		for(int i=0; i<SamNum; i++)
 		{	
 			for(int j=0; j<InDim;j++)
 			{
-				h_SamInEx[IDX2C(i,j,SamNum)] = imageList[i].content[j] / 16;
+				h_SamInEx[IDX2C(i,j,SamNum)] = testEntrance[i].content[j] / 16;
 			}
 		}
-		Test(h_SamInEx, InDim, HiddenUnitNum, OutDim, SamNum, h_W1Ex, h_W2Ex, imageList);
+		Test(h_SamInEx, InDim, HiddenUnitNum, OutDim, SamNum, h_W1Ex, h_W2Ex, testEntrance);
 	}
 	
 
@@ -339,6 +339,7 @@ bool InitImage(int SamNum, int InDim, int OutDim, int HiddenUnitNum, float* h_Sa
 	}
 	else
 	{
+		srand(time(NULL));
 		printf("Files not found completely, generating...\n");
 		for(int i=0; i<size_W1Ex; i++)
 		{
@@ -373,7 +374,7 @@ bool InitImage(int SamNum, int InDim, int OutDim, int HiddenUnitNum, float* h_Sa
 	}
 	
 
-	//srand(time(NULL));
+	
 	
 	
 	

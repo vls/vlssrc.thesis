@@ -105,7 +105,7 @@ int main(int argc, char** argv)
 	int trainnum = 20;
 	float precision = 0.000001;
 	float maxtime = 0.0f;
-	int testnum = 0;
+	int testnum = -1;
 #ifdef NDEBUG
 	cutGetCmdLineArgumenti(argc,(const char**) argv, "iter", &iter);
 	cutGetCmdLineArgumenti(argc,(const char**) argv, "train", &trainnum);
@@ -115,7 +115,7 @@ int main(int argc, char** argv)
 	
 	
 #endif // NDEBUG
-	if(testnum == 0) testnum = trainnum /2;
+	if(testnum == -1) testnum = trainnum /2;
 	printf("Iter = %d\n", iter);
 	printf("TrainNum = %d\n", trainnum);
 	printf("TestNum = %d\n", testnum);
@@ -150,7 +150,7 @@ freopen("CON","w", stdout);
 #endif // _DEBUG
 			if(testnum != 0)
 			{
-				nptr->TestSet(imageList, testnum);
+				nptr->TestSet(imageList+trainnum, testnum);
 			}
 			
 		}

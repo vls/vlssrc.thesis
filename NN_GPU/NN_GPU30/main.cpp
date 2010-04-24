@@ -29,7 +29,7 @@ main( int argc,char** argv)
 	int trainnum = 20;
 	bool isProfiler = false;
 	int intProfiler = 0;
-	int testnum = 0;
+	int testnum = -1;
 	float maxtime = 0.0f;
 	cutGetCmdLineArgumenti(argc, (const char**) argv, "train", &trainnum);
 	cutGetCmdLineArgumenti(argc, (const char**) argv, "iter", &iter);
@@ -41,7 +41,7 @@ main( int argc,char** argv)
 	{
 		isProfiler = true;
 	}
-	if(testnum == 0) testnum = trainnum /2;
+	if(testnum == -1) testnum = trainnum /2;
 	printf("Iter = %d\n", iter);
 	printf("TrainNum = %d\n", trainnum);
 	printf("TestNum = %d\n", testnum);
